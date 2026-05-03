@@ -1,0 +1,23 @@
+{
+  "name": "babymetal-cheki-booking",
+  "version": "1.0.0",
+  "description": "BABYMETAL themed cheki booking system with Vercel serverless backend",
+  "main": "api/checkout.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "babymetal",
+    "cheki",
+    "booking",
+    "vercel",
+    "serverless",
+    "google-sheets"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

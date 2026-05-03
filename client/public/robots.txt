@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://metanaru.vercel.app/sitemap.xml

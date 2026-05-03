@@ -1,0 +1,51 @@
+{
+  "site": {
+    "title": "METANARU OFFICIAL STORE",
+    "description": "Portal resmi pemesanan merchandise eksklusif Metanaru. Pilih member favoritmu, lengkapi data, dan tunjukkan dukunganmu pada unit ini."
+  },
+  "products": [
+    {
+      "id": 1,
+      "name": "FAY - SIGNED CHEKI",
+      "price": 150000,
+      "img": "https://placehold.co/300x400/1a1a1a/FFF.png?text=FAY+CHEKI"
+    },
+    {
+      "id": 2,
+      "name": "MOY - SIGNED CHEKI",
+      "price": 150000,
+      "img": "https://placehold.co/300x400/1a1a1a/FFF.png?text=MOY+CHEKI"
+    },
+    {
+      "id": 3,
+      "name": "JOI - SIGNED CHEKI",
+      "price": 150000,
+      "img": "https://placehold.co/300x400/1a1a1a/FFF.png?text=JOI+CHEKI"
+    },
+    {
+      "id": 4,
+      "name": "GROUP CHEKI (ALL MEMBER)",
+      "price": 200000,
+      "img": "https://placehold.co/300x400/500000/FFF.png?text=GROUP+CHEKI",
+      "tag": "HOT ITEM"
+    }
+  ],
+  "faq": [
+    {
+      "question": "APAKAH BISA REQUEST POSE / NAMA?",
+      "answer": "Untuk Cheki reguler, pose adalah random/tergantung member. Namun jika ada sesi khusus request, akan diinfokan di Instagram @metanaru."
+    },
+    {
+      "question": "BERAPA LAMA PROSES PENGIRIMAN?",
+      "answer": "Barang akan diproses H+3 setelah pembayaran dikonfirmasi. Pengiriman menggunakan ekspedisi JNE/J&T dari Jakarta."
+    },
+    {
+      "question": "APA ITU GROUP CHEKI?",
+      "answer": "Foto instan polaroid langka yang menampilkan seluruh member (Fay, Moy, Joi) dalam satu frame foto."
+    },
+    {
+      "question": "JIKA SAYA SALAH UPLOAD BUKTI BAYAR?",
+      "answer": "Harap segera hubungi admin via DM Instagram @metanaru dengan menyertakan Nama Pemesan yang anda input di website."
+    }
+  ]
+}
