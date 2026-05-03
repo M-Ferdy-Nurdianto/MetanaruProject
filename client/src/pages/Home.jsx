@@ -370,9 +370,9 @@ const Home = () => {
                 {posts?.length > 0 && [...posts, ...posts].map((post, idx) => {
                   const parsed = parseContent(post.content);
                   return (
-                  <div key={`${post.id}-${idx}`} className="min-w-[70vw] glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all">
+                  <div key={`${post.id}-${idx}`} className="min-w-[55vw] sm:min-w-[45vw] glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all">
                      {/* Image Section - Portrait Friendly Ratio */}
-                     <div className="relative aspect-[4/5] bg-[#111] overflow-hidden">
+                     <div className="relative aspect-square bg-[#111] overflow-hidden">
                         {post.image_url ? (
                             <img src={post.image_url} alt={post.title} className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700" />
                         ) : (
@@ -387,11 +387,11 @@ const Home = () => {
                      </div>
 
                      {/* Content Section */}
-                     <div className="p-5 bg-[#0a0a0a] flex flex-col gap-3 flex-grow">
-                        <h3 className="text-xl font-black text-white uppercase tracking-tighter leading-none line-clamp-1">
+                     <div className="p-4 bg-[#0a0a0a] flex flex-col gap-3 flex-grow">
+                        <h3 className="text-lg font-black text-white uppercase tracking-tighter leading-tight line-clamp-2">
                            {post.title}
                         </h3>
-                        <p className="text-[#888] text-[9px] font-bold uppercase tracking-widest line-clamp-2">
+                        <p className="text-[#888] text-[8px] font-bold uppercase tracking-widest line-clamp-2">
                            {parsed.text || 'No description available.'}
                         </p>
                         
