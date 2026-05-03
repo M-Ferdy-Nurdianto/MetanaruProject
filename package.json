@@ -1,24 +1,10 @@
 {
-  "name": "babymetal-cheki-booking",
+  "name": "metanaru-project",
   "version": "1.0.0",
-  "description": "BABYMETAL themed cheki booking system with Vercel serverless backend",
-  "main": "api/checkout.js",
+  "private": true,
   "scripts": {
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
     "build": "cd client && npm install && npm run build",
-    "dev": "vercel dev",
-    "deploy": "vercel --prod"
-  },
-  "keywords": [
-    "babymetal",
-    "cheki",
-    "booking",
-    "vercel",
-    "serverless",
-    "google-sheets"
-  ],
-  "author": "",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
+    "dev": "vercel dev"
   }
 }
