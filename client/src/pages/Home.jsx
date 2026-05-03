@@ -355,12 +355,12 @@ const Home = () => {
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#fff500]/10 to-transparent"></div>
         
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 sm:mb-16 gap-4">
              <div>
                 <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">Otsu Post</h2>
-                <p className="text-[#888] font-bold text-xs tracking-widest uppercase mt-2">Kabar dan rekap kegiatan terbaru</p>
+                <p className="text-[#888] font-bold text-[10px] sm:text-xs tracking-widest uppercase mt-2">Kabar dan rekap kegiatan terbaru</p>
              </div>
-             <Link to="/posts" className="text-[#FF0033] text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:underline">Lihat Semua →</Link>
+             <Link to="/posts" className="text-[#FF0033] text-[10px] font-black uppercase tracking-[0.2em] hover:underline md:mb-1">Lihat Semua →</Link>
           </div>
 
           {/* MOBILE VIEW - COMPACT 2-COLUMN GRID */}
