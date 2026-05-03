@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { SOCIAL_LINKS } from '../constants';
 
 const Footer = () => {
@@ -29,6 +30,9 @@ const Footer = () => {
                  className="text-[#fff500] hover:text-white ml-1 transition-all font-black drop-shadow-[0_0_8px_rgba(255,245,0,0.6)]">
                  JURAGAN WEBSITE
               </a>
+              <Link to="/login" className="text-[7px] text-[#111] hover:text-[#FF0033] ml-4 transition-all uppercase tracking-[0.3em] font-black opacity-20 hover:opacity-100">
+                [S]
+              </Link>
            </div>
         </div>
 

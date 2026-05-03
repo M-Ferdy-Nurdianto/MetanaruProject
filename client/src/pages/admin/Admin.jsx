@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { fetchMembers, API_URL } from '../../api';
 import { members as members_const } from '../../constants';
@@ -32,15 +33,21 @@ const TAB_LABELS = {
 };
 
 const Admin = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('adminActiveTab') || 'dashboard');
-  const [exportingId, setExportingId] = useState(null);
-  const [exportType, setExportType] = useState(null); // 'excel' or 'pdf'
-  const [modalTab, setModalTab] = useState('info'); // 'info' or 'lineup'
-  const [orders, setOrders] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [membersList, setMembersList] = useState([]);
-  const [toasts, setToasts] = useState([]);
+
+  // Auth Check
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('isAdminAuthenticated') === 'true';
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  const isAuthenticated = localStorage.getItem('isAdminAuthenticated') === 'true';
   const activeTabLabel = TAB_LABELS[activeTab] || 'Dashboard';
+
+  if (!isAuthenticated) return null;
 
   // Persistence for activeTab
   useEffect(() => {

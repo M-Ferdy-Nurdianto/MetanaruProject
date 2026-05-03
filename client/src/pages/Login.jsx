@@ -42,114 +42,156 @@ const Login = () => {
     }
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-10 sm:py-12 relative overflow-hidden" style={{ backgroundColor: 'var(--bg-main)' }}>
-      {/* Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-5%] w-[35%] h-[35%] sm:w-[40%] sm:h-[40%] bg-vibrant-pink rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] sm:w-[40%] sm:h-[40%] bg-gold rounded-full blur-[120px]" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-[#050505]">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#FF0033]/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#FF0033]/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-[440px] relative z-10"
       >
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-vibrant-pink/10 text-vibrant-pink mb-6 border border-vibrant-pink/20 shadow-lg shadow-vibrant-pink/5">
-            <ShieldCheck size={32} />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase mb-2">Staff Portal</h1>
-          <p className="text-[9px] sm:text-[10px] font-bold tracking-[0.25em] sm:tracking-[0.3em] text-gray-400 uppercase">Akses sistem internal METANARU</p>
+        {/* Logo Section */}
+        <div className="flex flex-col items-center mb-12">
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-[#FF0033] blur-[40px] opacity-20 rounded-full" />
+            <img 
+              src="/logos/logo.png" 
+              alt="METANARU" 
+              className="w-32 sm:w-40 relative z-10 drop-shadow-[0_0_20px_rgba(255,0,51,0.4)]"
+            />
+          </motion.div>
+          <motion.h1 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-3xl sm:text-4xl font-black tracking-tighter uppercase mt-6 text-white text-center"
+            style={{ fontFamily: "'Metal Mania', cursive" }}
+          >
+            STAFF<span className="text-[#FF0033]">.PORTAL</span>
+          </motion.h1>
+          <p className="text-[10px] font-bold tracking-[0.4em] text-gray-500 uppercase mt-2">Authorized Access Only</p>
         </div>
 
-        <div className="p-6 sm:p-8 rounded-3xl border border-white/5 backdrop-blur-xl bg-white/5 shadow-2xl relative">
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Username</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-vibrant-pink transition-colors">
-                  <User size={18} />
+        {/* Card Section */}
+        <div className="relative">
+          {/* Border Glow Effect */}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FF0033] to-[#880011] rounded-[2rem] opacity-20 blur-sm" />
+          
+          <div className="relative p-8 sm:p-10 rounded-[2rem] bg-black/60 backdrop-blur-2xl border border-white/5 shadow-2xl">
+            <form onSubmit={handleLogin} className="space-y-7">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF0033] ml-1">Admin Username</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-600 group-focus-within:text-[#FF0033] transition-colors">
+                    <User size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-xl block pl-12 p-4 focus:ring-1 focus:ring-[#FF0033]/50 focus:border-[#FF0033] transition-all outline-none placeholder:text-gray-700"
+                    placeholder="Username"
+                    required
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-2xl block pl-12 p-3.5 sm:p-4 focus:ring-1 focus:ring-vibrant-pink focus:border-vibrant-pink transition-all outline-none placeholder:text-gray-600"
-                  placeholder="Masukkan username"
-                  required
-                />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Password</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-vibrant-pink transition-colors">
-                  <Lock size={18} />
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#FF0033] ml-1">Access Token</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-600 group-focus-within:text-[#FF0033] transition-colors">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-xl block pl-12 pr-12 p-4 focus:ring-1 focus:ring-[#FF0033]/50 focus:border-[#FF0033] transition-all outline-none placeholder:text-gray-700"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 hover:text-[#FF0033] transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 text-white text-sm rounded-2xl block pl-12 pr-12 p-3.5 sm:p-4 focus:ring-1 focus:ring-vibrant-pink focus:border-vibrant-pink transition-all outline-none placeholder:text-gray-600"
-                  placeholder="••••••••"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-vibrant-pink transition-colors cursor-pointer"
+              </div>
+
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] font-bold uppercase tracking-tight"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold"
-              >
-                <AlertCircle size={16} />
-                {error}
-              </motion.div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-vibrant-pink hover:bg-pink-600 text-white font-black uppercase tracking-widest text-[11px] sm:text-xs py-4 sm:py-5 rounded-2xl transition-all shadow-xl shadow-vibrant-pink/20 hover:shadow-vibrant-pink/40 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  Masuk Sekarang
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </>
+                  <AlertCircle size={16} />
+                  {error}
+                </motion.div>
               )}
-            </button>
-          </form>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full relative group overflow-hidden bg-gradient-to-r from-[#FF0033] to-[#CC0029] text-white font-black uppercase tracking-[0.2em] text-xs py-5 rounded-xl transition-all shadow-[0_0_30px_rgba(255,0,51,0.2)] hover:shadow-[0_0_40px_rgba(255,0,51,0.4)] disabled:opacity-50 active:scale-95"
+              >
+                <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-[-20deg]" />
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      INITIALIZE ACCESS
+                      <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </span>
+              </button>
+            </form>
+          </div>
         </div>
 
-        <div className="mt-12 text-center text-[9px] sm:text-[10px] text-gray-600 font-bold uppercase tracking-[0.18em] sm:tracking-[0.2em] space-y-2">
-          <p>© 2026 METANARU — SYSTEM SECURITY</p>
+        {/* Footer info */}
+        <div className="mt-12 text-center">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="h-px w-8 bg-white/10" />
+            <ShieldCheck size={16} className="text-gray-600" />
+            <div className="h-px w-8 bg-white/10" />
+          </div>
+          <p className="text-[10px] text-gray-700 font-black uppercase tracking-[0.3em] mb-4">
+            © 2026 METANARU CORE SYSTEM
+          </p>
           <button 
             onClick={() => navigate('/')}
-            className="text-vibrant-pink hover:underline uppercase tracking-[0.3em]"
+            className="text-[10px] text-gray-500 hover:text-[#FF0033] font-bold uppercase tracking-[0.5em] transition-colors"
           >
-            ← Kembali ke Publik
+            RETURN TO PUBLIC SITE
           </button>
         </div>
       </motion.div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap');
+      `}</style>
     </div>
   );
 };
 
 export default Login;
+
 
 
 
