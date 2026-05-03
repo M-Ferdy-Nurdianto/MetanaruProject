@@ -389,8 +389,14 @@ exports.updateSettings = async (req, res) => {
 // =============================================
 // KEEP ALIVE
 // =============================================
-exports.getKeepAlive = (req, res) => {
-    res.status(200).send('Alive and connected to Supabase.');
+exports.getKeepAlive = async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('members').select('id').limit(1);
+        if (error) throw error;
+        res.status(200).json({ status: 'active', message: 'Supabase is awake', data });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
 };
 
 // =============================================
