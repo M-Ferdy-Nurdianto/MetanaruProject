@@ -370,9 +370,9 @@ const Home = () => {
                 {posts?.length > 0 && [...posts, ...posts].map((post, idx) => {
                   const parsed = parseContent(post.content);
                   return (
-                  <div key={`${post.id}-${idx}`} className="min-w-[55vw] sm:min-w-[45vw] glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all">
-                     {/* Image Section - Portrait Friendly Ratio */}
-                     <div className="relative aspect-square bg-[#111] overflow-hidden">
+                  <div key={`${post.id}-${idx}`} className="min-w-[70vw] glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all">
+                     {/* Image Section - Matches Member Card Ratio */}
+                     <div className="relative aspect-[3/4] bg-[#111] overflow-hidden">
                         {post.image_url ? (
                             <img src={post.image_url} alt={post.title} className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700" />
                         ) : (
