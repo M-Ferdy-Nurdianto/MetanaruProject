@@ -363,45 +363,37 @@ const Home = () => {
              <Link to="/posts" className="text-[#FF0033] text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:underline">Lihat Semua →</Link>
           </div>
 
-          {/* MOBILE VIEW - SEAMLESS INFINITE MARQUEE (Same as Members) */}
-          <div className="md:hidden overflow-hidden -mx-4">
-             <div className="animate-marquee flex gap-4 px-4 py-4">
-                {/* Render twice for seamless loop */}
-                {posts?.length > 0 && [...posts, ...posts].map((post, idx) => {
+          {/* MOBILE VIEW - COMPACT 2-COLUMN GRID */}
+          <div className="md:hidden px-4">
+             <div className="grid grid-cols-2 gap-3">
+                {posts?.length > 0 && posts.slice(0, 4).map((post) => {
                   const parsed = parseContent(post.content);
                   return (
-                  <div key={`${post.id}-${idx}`} className="min-w-[70vw] glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all">
-                     {/* Image Section - Matches Member Card Ratio */}
-                     <div className="relative aspect-[3/4] bg-[#111] overflow-hidden">
+                  <div key={post.id} className="glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all bg-[#0a0a0a]/80">
+                     {/* Shorter Image Section */}
+                     <div className="relative aspect-video bg-[#111] overflow-hidden">
                         {post.image_url ? (
-                            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700" />
+                            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover object-top" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                               <span className="text-2xl font-black text-[#222]">POSTER</span>
+                               <span className="text-xs font-black text-[#222]">MNR</span>
                             </div>
                         )}
-                        {/* Red Badge */}
-                        <div className="absolute top-4 left-4 bg-[#FF0033] text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest shadow-lg">
-                           {post.category || 'REKAP EVENT'}
+                        <div className="absolute top-2 left-2 bg-[#FF0033] text-white text-[7px] font-black px-1.5 py-0.5 uppercase tracking-widest">
+                           {post.category || 'POST'}
                         </div>
                      </div>
 
-                     {/* Content Section */}
-                     <div className="p-4 bg-[#0a0a0a] flex flex-col gap-3 flex-grow">
-                        <h3 className="text-lg font-black text-white uppercase tracking-tighter leading-tight line-clamp-2">
+                     {/* Compact Content Section */}
+                     <div className="p-3 flex flex-col gap-1.5 flex-grow">
+                        <h3 className="text-[11px] font-black text-white uppercase leading-tight line-clamp-2">
                            {post.title}
                         </h3>
-                        <p className="text-[#888] text-[8px] font-bold uppercase tracking-widest line-clamp-2">
-                           {parsed.text || 'No description available.'}
-                        </p>
-                        
-                        <div className="mt-auto pt-3">
-                           <a href={parsed.postUrl || '#'} target="_blank" rel="noopener noreferrer" className="inline-block">
-                              <span className="text-[9px] font-black text-white uppercase tracking-[0.3em] border-b border-white pb-1">
-                                 BACA SELENGKAPNYA
-                              </span>
-                           </a>
-                        </div>
+                        <a href={parsed.postUrl || '#'} target="_blank" rel="noopener noreferrer" className="mt-auto">
+                           <span className="text-[8px] font-black text-[#FF0033] uppercase tracking-widest">
+                              BACA →
+                           </span>
+                        </a>
                      </div>
                   </div>
                 )})
