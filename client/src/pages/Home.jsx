@@ -363,35 +363,38 @@ const Home = () => {
              <Link to="/posts" className="text-[#FF0033] text-[10px] font-black uppercase tracking-[0.2em] hover:underline md:mb-1">Lihat Semua →</Link>
           </div>
 
-          {/* MOBILE VIEW - COMPACT 2-COLUMN GRID */}
-          <div className="md:hidden px-4">
-             <div className="grid grid-cols-2 gap-3">
-                {posts?.length > 0 && posts.slice(0, 4).map((post) => {
+          {/* MOBILE VIEW - LARGE SNAP SLIDER */}
+          <div className="md:hidden">
+             <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 px-6 pb-8 custom-scrollbar-hide">
+                {posts?.length > 0 && [...posts, ...posts].map((post, idx) => {
                   const parsed = parseContent(post.content);
                   return (
-                  <div key={post.id} className="glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all bg-[#0a0a0a]/80">
-                     {/* Shorter Image Section */}
-                     <div className="relative aspect-video bg-[#111] overflow-hidden">
+                  <div key={`${post.id}-${idx}`} className="min-w-[85vw] snap-center glass-card group flex flex-col overflow-hidden bg-[#0a0a0a]/80 border-white/5">
+                     {/* Large Image Section */}
+                     <div className="relative aspect-[4/3] bg-[#111] overflow-hidden">
                         {post.image_url ? (
                             <img src={post.image_url} alt={post.title} className="w-full h-full object-cover object-top" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                               <span className="text-xs font-black text-[#222]">MNR</span>
+                               <span className="text-xl font-black text-[#222]">MNR</span>
                             </div>
                         )}
-                        <div className="absolute top-2 left-2 bg-[#FF0033] text-white text-[7px] font-black px-1.5 py-0.5 uppercase tracking-widest">
+                        <div className="absolute top-4 left-4 bg-[#FF0033] text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest shadow-xl">
                            {post.category || 'POST'}
                         </div>
                      </div>
 
-                     {/* Compact Content Section */}
-                     <div className="p-3 flex flex-col gap-1.5 flex-grow">
-                        <h3 className="text-[11px] font-black text-white uppercase leading-tight line-clamp-2">
+                     {/* Content Section */}
+                     <div className="p-6 flex flex-col gap-3 flex-grow bg-gradient-to-b from-[#0a0a0a] to-black">
+                        <h3 className="text-xl font-black text-white uppercase leading-tight line-clamp-2 tracking-tighter">
                            {post.title}
                         </h3>
-                        <a href={parsed.postUrl || '#'} target="_blank" rel="noopener noreferrer" className="mt-auto">
-                           <span className="text-[8px] font-black text-[#FF0033] uppercase tracking-widest">
-                              BACA →
+                        <p className="text-[#888] text-[10px] font-bold uppercase tracking-widest line-clamp-2 leading-relaxed">
+                           {parsed.text || 'Lihat detail postingan ini selengkapnya.'}
+                        </p>
+                        <a href={parsed.postUrl || '#'} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
+                           <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] border-b border-[#FF0033] pb-1">
+                              BACA SELENGKAPNYA →
                            </span>
                         </a>
                      </div>
