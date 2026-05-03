@@ -357,7 +357,7 @@ const Home = () => {
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 sm:mb-16 gap-4">
              <div>
-                <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">Otsu Post</h2>
+                <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">News & Otsu Post</h2>
                 <p className="text-[#888] font-bold text-[10px] sm:text-xs tracking-widest uppercase mt-2">Kabar dan rekap kegiatan terbaru</p>
              </div>
              <Link to="/posts" className="text-[#FF0033] text-[10px] font-black uppercase tracking-[0.2em] hover:underline md:mb-1">Lihat Semua →</Link>
