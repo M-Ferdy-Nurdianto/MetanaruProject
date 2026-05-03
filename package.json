@@ -4,6 +4,7 @@
   "description": "BABYMETAL themed cheki booking system with Vercel serverless backend",
   "main": "api/checkout.js",
   "scripts": {
+    "build": "cd client && npm install && npm run build",
     "dev": "vercel dev",
     "deploy": "vercel --prod"
   },
