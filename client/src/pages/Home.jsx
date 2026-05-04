@@ -123,7 +123,7 @@ const Home = () => {
 
       <Helmet>
         <title>METANARU | Official Website & Kawaii Metal Idol</title>
-        <meta name="description" content="Website resmi METANARU, grup idol Kawaii Metal asal Surabaya. Pesan Cheki member favoritmu dan pantau jadwal manggung terbaru kami." />
+        <meta name="description" content="TIDAK ADA LAGU ORIGINAL. TIDAK ADA LABEL BESAR. YANG ADA HANYA PANGGUNG, KERINGAT, DAN SUARA YANG AKAN MEROBEK TELINGAMU. METANARU." />
         <meta name="keywords" content="Metanaru, Idol Surabaya, Kawaii Metal, Cheki, Official Website, Metalcore Idol" />
       </Helmet>
       
@@ -158,8 +158,9 @@ const Home = () => {
            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter">Tentang Metanaru</h2>
            
            <p className="text-base sm:text-lg text-[#C0C0C0] font-bold leading-relaxed uppercase tracking-wide">
-              Grup idol Kawaii Metal asal Surabaya. Gabungan estetika manis J-Pop dengan agresivitas Metalcore. 
-              Setiap penampilan adalah ledakan energi bagi para fans.
+              TIDAK ADA LAGU ORIGINAL. TIDAK ADA LABEL BESAR. <br />
+              YANG ADA HANYA PANGGUNG, KERINGAT, DAN SUARA <br />
+              YANG AKAN MEROBEK TELINGAMU. METANARU.
            </p>
         </div>
       </section>

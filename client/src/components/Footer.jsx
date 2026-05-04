@@ -31,7 +31,7 @@ const Footer = () => {
                  JURAGAN WEBSITE
               </a>
               <Link to="/login" className="text-[7px] text-[#111] hover:text-[#FF0033] ml-4 transition-all uppercase tracking-[0.3em] font-black opacity-20 hover:opacity-100">
-                [S]
+                LOGIN STAFF
               </Link>
            </div>
         </div>
