@@ -131,46 +131,47 @@ const SettingsSection = ({
                     <button
                       key={m.id}
                       onClick={() => {
-                        const isSelected = eventForm.available_members.includes(m.nickname);
+                        const isSelected = eventForm.available_members.includes(m.nickname || m.name);
                         setEventForm(prev => ({
                           ...prev,
                           available_members: isSelected 
-                            ? prev.available_members.filter(nm => nm !== m.nickname)
-                            : [...prev.available_members, m.nickname]
+                            ? prev.available_members.filter(nm => nm !== (m.nickname || m.name))
+                            : [...prev.available_members, (m.nickname || m.name)]
                         }));
                       }}
-                      className={`py-1.5 rounded text-[10px] font-bold uppercase transition-all ${
-                        eventForm.available_members.includes(m.nickname)
-                          ? 'bg-[#FF0033] text-white shadow-lg shadow-[#FF0033]/20'
-                          : 'bg-white/5 text-white/40 hover:bg-white/10'
+                      className={`py-3 rounded-xl text-[12px] font-black uppercase transition-all border-b-4 ${
+                        eventForm.available_members.includes(m.nickname || m.name)
+                          ? 'bg-[#FF0033] text-white border-red-800 shadow-lg shadow-[#FF0033]/30 scale-95'
+                          : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10 hover:border-white/10'
                       }`}
                     >
-                      {m.nickname}
+                      {m.nickname || m.name}
                     </button>
                   ))}
                 </div>
                 
                 {/* Row 2: NOT SIGNAL / Others (Centered) */}
-                <div className="grid grid-cols-2 gap-2 opacity-60">
+                <div className="grid grid-cols-2 gap-2 opacity-80">
                    {membersList.filter(m => m.name === 'NOT SIGNAL').map(m => (
                     <button
                       key={m.id}
                       onClick={() => {
-                        const isSelected = eventForm.available_members.includes(m.nickname);
+                        const label = m.nickname || m.name || 'NOT SIGNAL';
+                        const isSelected = eventForm.available_members.includes(label);
                         setEventForm(prev => ({
                           ...prev,
                           available_members: isSelected 
-                            ? prev.available_members.filter(nm => nm !== m.nickname)
-                            : [...prev.available_members, m.nickname]
+                            ? prev.available_members.filter(nm => nm !== label)
+                            : [...prev.available_members, label]
                         }));
                       }}
-                      className={`py-1.5 rounded text-[10px] font-bold uppercase transition-all ${
-                        eventForm.available_members.includes(m.nickname)
-                          ? 'bg-amber-600 text-white shadow-lg'
-                          : 'bg-white/5 text-white/40 hover:bg-white/10'
+                      className={`py-3 rounded-xl text-[12px] font-black uppercase transition-all border-b-4 ${
+                        eventForm.available_members.includes(m.nickname || m.name || 'NOT SIGNAL')
+                          ? 'bg-amber-600 text-white border-amber-800 shadow-lg scale-95'
+                          : 'bg-white/5 text-white/40 border-white/5 hover:bg-white/10 hover:border-white/10'
                       }`}
                     >
-                      {m.nickname || 'NOT SIGNAL'}
+                      {m.nickname || m.name || 'NOT SIGNAL'}
                     </button>
                   ))}
                 </div>

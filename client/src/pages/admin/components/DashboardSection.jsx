@@ -164,25 +164,26 @@ const DashboardSection = ({
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {membersList.map(m => {
-                  const inLineup = isMemberInLineup(m.nickname);
-                  const qty = otsForm.selectedMembers[m.nickname] || 0;
+                  const label = m.nickname || m.name || 'NOT SIGNAL';
+                  const inLineup = isMemberInLineup(label);
+                  const qty = otsForm.selectedMembers[label] || 0;
                   return (
                     <div key={m.id} className="relative">
                       <button
                         type="button"
                         disabled={!inLineup}
-                        onClick={() => toggleMember(m.nickname)}
-                        className={`w-full py-2 rounded-lg text-xs font-semibold transition-all relative ${
+                        onClick={() => toggleMember(label)}
+                        className={`w-full py-3.5 rounded-xl text-[13px] font-black uppercase transition-all relative border-b-4 ${
                           qty > 0 
-                            ? "bg-white text-black border-2 border-[#FF0033]" 
+                            ? "bg-white text-black border-white/20 shadow-xl scale-95" 
                             : inLineup
-                              ? "bg-[#0A0A0B] border border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
-                              : "bg-white/5 border border-white/5 text-white/10 cursor-not-allowed opacity-30"
+                              ? "bg-[#0A0A0B] border-white/5 text-white/40 hover:bg-white/5 hover:text-white"
+                              : "bg-white/5 border-transparent text-white/10 cursor-not-allowed opacity-20"
                         }`}
                       >
-                        {m.nickname}
+                        {label}
                         {qty > 0 && (
-                          <div className="absolute -top-2 -right-1 w-4 h-4 rounded-full bg-[#FF0033] text-white flex items-center justify-center text-[9px] font-black shadow-lg">
+                          <div className="absolute -top-2 -right-1 w-5 h-5 rounded-full bg-[#FF0033] text-white flex items-center justify-center text-[10px] font-black shadow-lg border border-black/20">
                             {qty}
                           </div>
                         )}
@@ -190,7 +191,7 @@ const DashboardSection = ({
                       {qty > 0 && (
                         <button
                           type="button"
-                          onClick={(e) => decrementMember(e, m.nickname)}
+                          onClick={(e) => decrementMember(e, label)}
                           className="absolute -bottom-1 -left-1 w-5 h-5 bg-black text-white border border-white/30 text-[12px] rounded-full flex items-center justify-center font-bold hover:bg-red-500 hover:border-red-500 transition-all z-10 shadow-lg active:scale-95"
                           title="Kurangi / Hapus"
                         >
