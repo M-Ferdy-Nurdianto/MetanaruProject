@@ -2,6 +2,8 @@ const ExcelJS = require('exceljs');
 const { jsPDF } = require('jspdf');
 require('jspdf-autotable');
 const supabase = require('../supabaseClient');
+const fs = require('fs');
+const path = require('path');
 
 // =============================================
 // Internal pricing logic
@@ -420,12 +422,35 @@ exports.exportToExcel = async (req, res) => {
         if (error) throw error;
 
         const workbook = new ExcelJS.Workbook();
+        
+        // Add Logo to Workbook
+        const logoPath = path.join(__dirname, '../../client/public/logos/logo.png');
+        let logoId = null;
+        if (fs.existsSync(logoPath)) {
+            logoId = workbook.addImage({
+                buffer: fs.readFileSync(logoPath),
+                extension: 'png',
+            });
+        }
 
         // SHEET 1: SUMMARY
         const summarySheet = workbook.addWorksheet('Event Summary');
+        
+        if (logoId !== null) {
+            summarySheet.addImage(logoId, {
+                tl: { col: 0, row: 0 },
+                ext: { width: 120, height: 40 }
+            });
+            // Push content down to avoid overlapping with logo
+            summarySheet.addRow([]);
+            summarySheet.addRow([]);
+            summarySheet.addRow([]);
+        }
+
         summarySheet.columns = [
-            { header: 'Metric', key: 'metric', width: 25 },
-            { header: 'Value', key: 'value', width: 20 }
+            { header: 'Metric', key: 'metric', width: 30 },
+            { header: 'Value', key: 'value', width: 25 },
+            { header: 'Note', key: 'note', width: 20 }
         ];
 
         const totalSales = eventOrders.reduce((acc, o) => acc + o.total_price, 0);
@@ -522,12 +547,19 @@ exports.exportToPdf = async (req, res) => {
         doc.setFillColor(...dark);
         doc.rect(0, 0, 210, 45, 'F');
 
+        // Logo insertion
+        const logoPath = path.join(__dirname, '../../client/public/logos/logo.png');
+        if (fs.existsSync(logoPath)) {
+            const logoBase64 = fs.readFileSync(logoPath).toString('base64');
+            doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25);
+        }
+
         doc.setFontSize(28);
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
-        doc.text("METANARU", 14, 25);
+        doc.text("METANARU", 45, 25);
         doc.setTextColor(...pink);
-        doc.text(".REPORT", 48, 25);
+        doc.text(".REPORT", 95, 25);
 
         doc.setFontSize(10);
         doc.setTextColor(150, 150, 150);
