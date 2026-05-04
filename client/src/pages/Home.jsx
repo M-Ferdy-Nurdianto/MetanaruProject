@@ -122,9 +122,9 @@ const Home = () => {
 
 
       <Helmet>
-        <title>METANARU | Official Webcheki & Kawaii Metal Idol</title>
+        <title>METANARU | Official Website & Kawaii Metal Idol</title>
         <meta name="description" content="Website resmi METANARU, grup idol Kawaii Metal asal Surabaya. Pesan Cheki member favoritmu dan pantau jadwal manggung terbaru kami." />
-        <meta name="keywords" content="Metanaru, Idol Surabaya, Kawaii Metal, Cheki, Webcheki, Metalcore Idol" />
+        <meta name="keywords" content="Metanaru, Idol Surabaya, Kawaii Metal, Cheki, Official Website, Metalcore Idol" />
       </Helmet>
       
       <section className="relative min-h-[90vh] flex items-center justify-center pt-20 overflow-hidden bg-black">
