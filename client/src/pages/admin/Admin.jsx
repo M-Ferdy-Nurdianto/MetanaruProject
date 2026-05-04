@@ -35,6 +35,13 @@ const TAB_LABELS = {
 const Admin = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('adminActiveTab') || 'dashboard');
+  const [exportingId, setExportingId] = useState(null);
+  const [exportType, setExportType] = useState(null); // 'excel' or 'pdf'
+  const [modalTab, setModalTab] = useState('info'); // 'info' or 'lineup'
+  const [orders, setOrders] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [membersList, setMembersList] = useState([]);
+  const [toasts, setToasts] = useState([]);
 
   // Auth Check
   useEffect(() => {
