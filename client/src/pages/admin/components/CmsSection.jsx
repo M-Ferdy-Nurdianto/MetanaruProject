@@ -4,7 +4,7 @@ import { supabase } from '../../../supabase';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-const CmsSection = () => {
+const CmsSection = ({ showToast, setConfirmModal }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -48,14 +48,23 @@ const CmsSection = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Hapus post ini secara permanen?')) return;
-    try {
-      const { error } = await supabase.from('posts').delete().eq('id', id);
-      if (error) throw error;
-      setPosts(posts.filter(p => p.id !== id));
-    } catch (err) {
-      console.error('Error deleting post:', err);
-    }
+    setConfirmModal({
+      show: true,
+      title: 'Hapus Post',
+      message: 'Apakah Anda yakin ingin menghapus post ini secara permanen? Tindakan ini tidak dapat dibatalkan.',
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        try {
+          const { error } = await supabase.from('posts').delete().eq('id', id);
+          if (error) throw error;
+          setPosts(posts.filter(p => p.id !== id));
+          showToast('Post berhasil dihapus.');
+        } catch (err) {
+          console.error('Error deleting post:', err);
+          showToast('Gagal menghapus post.', 'error');
+        }
+      }
+    });
   };
 
   const parseContent = (contentStr) => {
@@ -188,9 +197,10 @@ const CmsSection = () => {
       }
       setIsModalOpen(false);
       fetchPosts();
+      showToast(`Post berhasil ${editingId ? 'diperbarui' : 'dibuat'}!`);
     } catch (error) {
       console.error('Error saving post:', error);
-      alert('Gagal menyimpan post!');
+      showToast('Gagal menyimpan post!', 'error');
     } finally {
       setIsSubmitting(false);
     }

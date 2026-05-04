@@ -21,6 +21,7 @@ import ConfirmModal from './components/ConfirmModal';
 import OrderDetailsModal from './components/OrderDetailsModal';
 import PrivacyModal from './components/PrivacyModal';
 import AdminToasts from './components/AdminToasts';
+import Loading from '../../components/Loading';
 
 const ADMIN_API = API_URL;
 const TAB_LABELS = {
@@ -729,47 +730,10 @@ const Admin = () => {
     return matchesStatus && matchesEvent && matchesSearch;
   });
 
-  if (loading) {
-     return (
-       <div className="min-h-screen admin-metal flex flex-col items-center justify-center relative overflow-hidden">
-         <div className="pointer-events-none absolute inset-0 metal-grid" />
-         <div className="pointer-events-none absolute inset-0 metal-noise" />
-         <div className="pointer-events-none absolute inset-0 metal-sheen" />
-         <div className="relative z-10 flex flex-col items-center">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-white/5 border-t-[#FF0033] rounded-full animate-spin"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 bg-[#FF0033]/10 rounded-full blur-xl animate-pulse"></div>
-            </div>
-          </div>
-          <h1 className="mt-8 text-xl font-black tracking-tight metal-title animate-pulse">
-            METANARU<span className="text-[#FF0033]">.ADMIN</span>
-          </h1>
-          <div className="mt-4 flex flex-col items-center gap-2">
-            <div className="h-1 w-48 bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-[#FF0033] animate-progress-loading"></div>
-            </div>
-            <p className="metal-kicker text-white/40">
-              Synchronizing Database
-            </p>
-          </div>
-         </div>
-         <style>{`
-             @keyframes progress-loading {
-                0% { width: 0%; transform: translateX(-100%); }
-                50% { width: 50%; transform: translateX(0%); }
-                100% { width: 0%; transform: translateX(200%); }
-             }
-             .animate-progress-loading {
-                animation: progress-loading 2s infinite ease-in-out;
-             }
-          `}</style>
-       </div>
-     );
-  }
+  if (loading) return <Loading />;
 
   return (
-    <div className="min-h-[100dvh] admin-metal text-white flex relative overflow-hidden">
+    <div className="h-[100dvh] admin-metal text-white flex relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 metal-grid" />
       <div className="pointer-events-none absolute inset-0 metal-noise" />
       <div className="pointer-events-none absolute -top-24 left-0 right-0 h-72 metal-sheen" />
@@ -798,7 +762,7 @@ const Admin = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 lg:ml-5 min-w-0 p-3 sm:p-4 md:p-6 lg:pl-10 lg:pr-10 lg:pt-8 lg:pb-12 relative z-10 overflow-y-auto custom-scrollbar h-full">
+      <main className="flex-1 lg:ml-56 min-w-0 p-3 sm:p-4 md:p-6 lg:pl-10 lg:pr-10 lg:pt-8 lg:pb-12 relative z-10 overflow-y-auto custom-scrollbar h-full">
         <div className="mb-6 sm:mb-10 flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -865,6 +829,8 @@ const Admin = () => {
             membersList={membersList}
             getMemberImageSrc={getMemberImageSrc}
             getMemberFallbackImage={getMemberFallbackImage}
+            showToast={showToast}
+            setConfirmModal={setConfirmModal}
           />
         )}
 
