@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PRICING, members } from '../constants';
 import { useNavigate } from 'react-router-dom';
 import { fetchMembers, fetchEvents } from '../api';
+import Loading from '../components/Loading';
+import Toast from '../components/Toast';
 
 const Cheki = () => {
   const [cart, setCart] = useState([]);
@@ -10,6 +13,7 @@ const Cheki = () => {
   const [events, setEvents] = useState([]);
   const [activeEvent, setActiveEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
   const IS_MAINTENANCE = false; // System is now active
 
@@ -46,10 +50,13 @@ const Cheki = () => {
 
   const addToCart = (item) => {
     setCart([...cart, { ...item, cartId: Date.now() }]);
+    setToast({ message: `${item.name} DITAMBAHKAN KE KERANJANG`, type: 'success' });
   };
 
   const removeFromCart = (cartId) => {
+    const item = cart.find(i => i.cartId === cartId);
     setCart(cart.filter(item => item.cartId !== cartId));
+    if (item) setToast({ message: `${item.name} DIHAPUS`, type: 'info' });
   };
 
   const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
@@ -60,8 +67,19 @@ const Cheki = () => {
     navigate('/checkout');
   };
 
+  if (loading) return <Loading />;
+
   return (
     <div className="bg-black min-h-screen">
+      <AnimatePresence>
+        {toast && (
+          <Toast 
+            message={toast.message} 
+            type={toast.type} 
+            onClose={() => setToast(null)} 
+          />
+        )}
+      </AnimatePresence>
       <Helmet>
         <title>Cheki Station | METANARU Official</title>
         <meta name="description" content="Amankan slot Cheki favoritmu di Metanaru Cheki Station." />

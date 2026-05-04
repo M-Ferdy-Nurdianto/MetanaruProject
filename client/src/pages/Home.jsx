@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SLOGAN, SOCIAL_LINKS, members as MEMBERS_FALLBACK } from '../constants';
 import { fetchMembers, fetchEvents, fetchPostEvents } from '../api';
 import { supabase } from '../supabase';
+import Loading from '../components/Loading';
+import Toast from '../components/Toast';
 
 const Home = () => {
   const [members, setMembers] = useState([]);
   const [events, setEvents] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
 
   const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' });
 
@@ -117,8 +121,19 @@ const Home = () => {
   }, [events]);
   /* Loading screen disabled for debug */
   
+  if (loading) return <Loading />;
+  
   return (
     <div className="flex flex-col bg-black min-h-screen">
+      <AnimatePresence>
+        {toast && (
+          <Toast 
+            message={toast.message} 
+            type={toast.type} 
+            onClose={() => setToast(null)} 
+          />
+        )}
+      </AnimatePresence>
 
 
       <Helmet>

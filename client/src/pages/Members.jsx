@@ -2,27 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { fetchMembers } from '../api';
 import { SLOGAN, members as MEMBERS_FALLBACK } from '../constants';
+import Loading from '../components/Loading';
 
 const Members = () => {
   const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetchMembers().then(data => {
-      // Fallback if empty
       const finalMembers = (data && data.length > 0) ? data : MEMBERS_FALLBACK;
-      
-      // Sort members so NOT SIGNAL is always last
       const sorted = [...finalMembers].sort((a, b) => {
         if (a.name === 'NOT SIGNAL') return 1;
         if (b.name === 'NOT SIGNAL') return -1;
         return a.id - b.id;
       });
       setMembers(sorted.map(m => ({ ...m, themeColor: m.theme_color || m.themeColor })));
+      setLoading(false);
     }).catch(err => {
       console.error("Error loading members:", err);
       setMembers(MEMBERS_FALLBACK.map(m => ({ ...m, themeColor: m.themeColor })));
+      setLoading(false);
     });
   }, []);
+
+  if (loading) return <Loading />;
   return (
     <div className="bg-black min-h-screen">
       <Helmet>

@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Newspaper } from 'lucide-react';
 import { supabase } from '../supabase';
+import Loading from '../components/Loading';
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  if (loading) return <Loading />;
 
   const parseContent = (contentStr) => {
     try {
-      if (contentStr && contentStr.startsWith('{')) {
+      if (contentStr && typeof contentStr === 'string' && contentStr.startsWith('{')) {
         return JSON.parse(contentStr);
       }
     } catch (e) {}
