@@ -129,11 +129,11 @@ const Home = () => {
 
 
       <Helmet>
-        <title>METANARU | Official Website & Kawaii Metal Idol</title>
+        <title>Metanaru Official Website</title>
         <meta name="description" content="TIDAK ADA LAGU ORIGINAL. TIDAK ADA LABEL BESAR. YANG ADA HANYA PANGGUNG, KERINGAT, DAN SUARA YANG AKAN MEROBEK TELINGAMU. METANARU." />
         <meta name="keywords" content="Metanaru, Idol Surabaya, Kawaii Metal, Cheki, Official Website, Metalcore Idol" />
         <meta property="og:site_name" content="Metanaru" />
-        <meta property="og:title" content="Metanaru | Official Website & Kawaii Metal Idol" />
+        <meta property="og:title" content="Metanaru Official Website" />
         <meta property="og:url" content="https://metanaru.vercel.app/" />
         <meta property="og:image" content="https://metanaru.vercel.app/logos/logo.png" />
       </Helmet>
