@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, ChevronLeft, CreditCard, Send, Sparkles, 
@@ -249,6 +250,9 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen relative pt-28 pb-16 sm:pt-32 sm:pb-20 px-4 sm:px-6 md:px-12 bg-black overflow-hidden">
+      <Helmet>
+        <title>Metanaru Official Website</title>
+      </Helmet>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[720px] h-[420px] bg-[#FF0033]/12 blur-[140px] pointer-events-none" />
       
       <div className="max-w-5xl mx-auto relative z-10">

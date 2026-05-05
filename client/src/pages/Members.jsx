@@ -30,7 +30,7 @@ const Members = () => {
   return (
     <div className="bg-black min-h-screen">
       <Helmet>
-        <title>Daftar Member | METANARU Official</title>
+        <title>Metanaru Official Website</title>
         <meta name="description" content="Kenali personel METANARU. Profil lengkap member Kawaii Metal Surabaya: Fay, Moi, Nera, Joy, dan Caca." />
       </Helmet>
       <section className="relative pt-24 sm:pt-32 pb-12 sm:pb-20 overflow-hidden bg-black">

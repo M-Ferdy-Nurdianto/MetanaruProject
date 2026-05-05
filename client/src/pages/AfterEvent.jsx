@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { fetchPostEvents } from '../api';
 
 const fallbackPosts = [
@@ -48,6 +49,9 @@ const AfterEvent = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
+      <Helmet>
+        <title>Metanaru Official Website</title>
+      </Helmet>
         {/* Smoother, Multi-layered Hero Background */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,_rgba(255,0,51,0.12)_0%,_transparent_80%)] pointer-events-none"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black pointer-events-none"></div>

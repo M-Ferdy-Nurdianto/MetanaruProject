@@ -81,7 +81,7 @@ const Cheki = () => {
         )}
       </AnimatePresence>
       <Helmet>
-        <title>Cheki Station | METANARU Official</title>
+        <title>Metanaru Official Website</title>
         <meta name="description" content="Amankan slot Cheki favoritmu di Metanaru Cheki Station." />
       </Helmet>
 

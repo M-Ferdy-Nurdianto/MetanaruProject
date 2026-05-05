@@ -39,7 +39,7 @@ const Posts = () => {
   return (
     <div className="bg-black min-h-screen">
       <Helmet>
-        <title>Otsu Post | METANARU Official</title>
+        <title>Metanaru Official Website</title>
         <meta name="description" content="Kabar terbaru, pengumuman, dan rekap kegiatan METANARU." />
       </Helmet>
       <section className="relative pt-24 sm:pt-32 pb-16 sm:pb-24 overflow-hidden bg-black">
