@@ -17,22 +17,14 @@ const Home = () => {
 
   const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' });
 
-  const parseContent = (contentStr) => {
-    try {
-      if (contentStr && typeof contentStr === 'string' && contentStr.startsWith('{')) {
-        return JSON.parse(contentStr);
-      }
-    } catch (e) {}
-    return { text: contentStr, postUrl: '' };
-  };
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const [mems, evs, { data: psts }] = await Promise.all([
+      const [mems, evs, psts] = await Promise.all([
         fetchMembers().catch(() => []),
         fetchEvents().catch(() => []),
-        supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(4)
+        fetchPostEvents().catch(() => [])
       ]);
       
       const finalMembers = (mems && mems.length > 0) ? mems : MEMBERS_FALLBACK;
@@ -43,7 +35,7 @@ const Home = () => {
       });
       setMembers(sorted.map(m => ({ ...m, themeColor: m.theme_color || m.themeColor })));
       setEvents(evs || []);
-      setPosts(psts || []);
+      setPosts(psts.slice(0, 4) || []);
     } catch (err) {
       console.error('Error loading home data:', err);
       setMembers(MEMBERS_FALLBACK.map(m => ({ ...m, themeColor: m.themeColor })));
@@ -140,6 +132,10 @@ const Home = () => {
         <title>METANARU | Official Website & Kawaii Metal Idol</title>
         <meta name="description" content="TIDAK ADA LAGU ORIGINAL. TIDAK ADA LABEL BESAR. YANG ADA HANYA PANGGUNG, KERINGAT, DAN SUARA YANG AKAN MEROBEK TELINGAMU. METANARU." />
         <meta name="keywords" content="Metanaru, Idol Surabaya, Kawaii Metal, Cheki, Official Website, Metalcore Idol" />
+        <meta property="og:site_name" content="Metanaru" />
+        <meta property="og:title" content="Metanaru | Official Website & Kawaii Metal Idol" />
+        <meta property="og:url" content="https://metanaru.vercel.app/" />
+        <meta property="og:image" content="https://metanaru.vercel.app/logos/logo.png" />
       </Helmet>
       
       <section className="relative min-h-[90vh] flex items-center justify-center pt-20 overflow-hidden bg-black">
@@ -382,9 +378,7 @@ const Home = () => {
           {/* MOBILE VIEW - LARGE SNAP SLIDER */}
           <div className="md:hidden">
              <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 px-6 pb-8 custom-scrollbar-hide">
-                {posts?.length > 0 && [...posts, ...posts].map((post, idx) => {
-                  const parsed = parseContent(post.content);
-                  return (
+                {posts?.length > 0 && posts.map((post, idx) => (
                   <div key={`${post.id}-${idx}`} className="min-w-[85vw] snap-center glass-card group flex flex-col overflow-hidden bg-[#0a0a0a]/80 border-white/5">
                      {/* Large Image Section */}
                      <div className="relative aspect-[4/3] bg-[#111] overflow-hidden">
@@ -396,7 +390,7 @@ const Home = () => {
                             </div>
                         )}
                         <div className="absolute top-4 left-4 bg-[#FF0033] text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest shadow-xl">
-                           {post.category || 'POST'}
+                           OTSU POST
                         </div>
                      </div>
 
@@ -406,25 +400,23 @@ const Home = () => {
                            {post.title}
                         </h3>
                         <p className="text-[#888] text-[10px] font-bold uppercase tracking-widest line-clamp-2 leading-relaxed">
-                           {parsed.text || 'Lihat detail postingan ini selengkapnya.'}
+                           {post.caption || 'Lihat detail postingan ini selengkapnya.'}
                         </p>
-                        <a href={parsed.postUrl || '#'} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
+                        <a href={post.instagram_url || '#'} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block">
                            <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] border-b border-[#FF0033] pb-1">
-                              BACA SELENGKAPNYA →
+                              LIHAT DI INSTAGRAM →
                            </span>
                         </a>
                      </div>
                   </div>
-                )})
-                }
+                ))}
              </div>
           </div>
 
           {/* DESKTOP VIEW - GRID 4 COLS */}
+
           <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-             {posts?.length > 0 && posts.slice(0, 4).map((post) => {
-                const parsed = parseContent(post.content);
-                return (
+             {posts?.length > 0 && posts.slice(0, 4).map((post) => (
                 <div key={post.id} className="glass-card group flex flex-col overflow-hidden hover:border-[#FF0033]/30 transition-all">
                    {/* Image Section - Portrait Friendly Ratio */}
                    <div className="relative aspect-[4/5] bg-[#111] overflow-hidden">
@@ -437,7 +429,7 @@ const Home = () => {
                       )}
                       {/* Red Badge */}
                       <div className="absolute top-4 left-4 bg-[#FF0033] text-white text-[10px] font-black px-3 py-1.5 uppercase tracking-widest shadow-lg">
-                         {post.category || 'REKAP EVENT'}
+                         OTSU POST
                       </div>
                    </div>
 
@@ -447,19 +439,19 @@ const Home = () => {
                          {post.title}
                       </h3>
                       <p className="text-[#888] text-[10px] font-bold uppercase tracking-widest line-clamp-2">
-                         {parsed.text || 'No description available.'}
+                         {post.caption || 'No description available.'}
                       </p>
                       
                       <div className="mt-auto pt-4">
-                         <a href={parsed.postUrl || '#'} target="_blank" rel="noopener noreferrer" className="inline-block">
+                         <a href={post.instagram_url || '#'} target="_blank" rel="noopener noreferrer" className="inline-block">
                             <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] border-b border-white pb-1 hover:text-[#FF0033] hover:border-[#FF0033] transition-all">
-                               BACA SELENGKAPNYA
+                               OPEN INSTAGRAM
                             </span>
                          </a>
                       </div>
                    </div>
                 </div>
-             )})
+             ))
              }
           </div>
 

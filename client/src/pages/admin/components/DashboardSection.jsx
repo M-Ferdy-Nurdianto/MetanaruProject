@@ -177,7 +177,9 @@ const DashboardSection = ({
                           qty > 0 
                             ? "bg-white text-black border-white/20 shadow-xl scale-95" 
                             : inLineup
-                              ? "bg-[#0A0A0B] border-white/5 text-white/40 hover:bg-white/5 hover:text-white"
+                              ? label === 'NOT SIGNAL'
+                                ? "bg-white/5 border-dashed border-white/10 text-white/20 hover:bg-white/10 hover:text-white/40"
+                                : "bg-[#0A0A0B] border-white/5 text-white/40 hover:bg-white/5 hover:text-white"
                               : "bg-white/5 border-transparent text-white/10 cursor-not-allowed opacity-20"
                         }`}
                       >

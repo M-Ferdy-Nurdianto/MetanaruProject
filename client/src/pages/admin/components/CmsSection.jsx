@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Newspaper, Plus, Trash2, Edit3, Image as ImageIcon, ExternalLink, X, Upload } from 'lucide-react';
-import { supabase } from '../../../supabase';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+import { 
+  fetchAdminPostEvents, 
+  createPostEvent, 
+  updatePostEvent, 
+  deletePostEvent, 
+  uploadPostEventImage 
+} from '../../../api';
 
 const CmsSection = ({ showToast, setConfirmModal }) => {
   const [posts, setPosts] = useState([]);
@@ -14,10 +17,11 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
-    category: 'PENGUMUMAN',
-    content: '',
-    post_url: '',
-    image_url: ''
+    event_date: '',
+    caption: '',
+    instagram_url: '',
+    image_url: '',
+    is_featured: false
   });
   
   const [imageFile, setImageFile] = useState({
@@ -29,15 +33,11 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
+      const data = await fetchAdminPostEvents();
       setPosts(data || []);
     } catch (err) {
-      console.error('Error fetching posts:', err);
+      console.error('Error fetching post events:', err);
+      showToast('Gagal memuat data Otsu Post.', 'error');
     } finally {
       setLoading(false);
     }
@@ -50,54 +50,43 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
   const handleDelete = async (id) => {
     setConfirmModal({
       show: true,
-      title: 'Hapus Post',
+      title: 'Hapus Otsu Post',
       message: 'Apakah Anda yakin ingin menghapus post ini secara permanen? Tindakan ini tidak dapat dibatalkan.',
       onConfirm: async () => {
         setConfirmModal(prev => ({ ...prev, show: false }));
         try {
-          const { error } = await supabase.from('posts').delete().eq('id', id);
-          if (error) throw error;
+          await deletePostEvent(id);
           setPosts(posts.filter(p => p.id !== id));
-          showToast('Post berhasil dihapus.');
+          showToast('Otsu Post berhasil dihapus.');
         } catch (err) {
-          console.error('Error deleting post:', err);
+          console.error('Error deleting post event:', err);
           showToast('Gagal menghapus post.', 'error');
         }
       }
     });
   };
 
-  const parseContent = (contentStr) => {
-    try {
-      if (contentStr && contentStr.startsWith('{')) {
-        return JSON.parse(contentStr);
-      }
-    } catch (e) {
-      // ignore
-    }
-    return { text: contentStr, postUrl: '' };
-  };
-
   const openModal = (post = null) => {
     if (post) {
-      const parsed = parseContent(post.content);
       setEditingId(post.id);
       setFormData({
         title: post.title || '',
-        category: post.category || 'PENGUMUMAN',
-        content: parsed.text || '',
-        post_url: parsed.postUrl || '',
-        image_url: post.image_url || ''
+        event_date: post.event_date || '',
+        caption: post.caption || '',
+        instagram_url: post.instagram_url || '',
+        image_url: post.image_url || '',
+        is_featured: post.is_featured || false
       });
       setImageFile({ file: null, preview: post.image_url, isCompressing: false });
     } else {
       setEditingId(null);
       setFormData({
         title: '',
-        category: 'PENGUMUMAN',
-        content: '',
-        post_url: '',
-        image_url: ''
+        event_date: new Date().toISOString().split('T')[0],
+        caption: '',
+        instagram_url: '',
+        image_url: '',
+        is_featured: false
       });
       setImageFile({ file: null, preview: null, isCompressing: false });
     }
@@ -160,58 +149,38 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
 
       // Upload if new image is selected
       if (imageFile.file) {
-        const uploadData = new FormData();
-        uploadData.append('proof', imageFile.file, 'post_image.webp');
-        const uploadRes = await fetch(`${API_URL}/orders/upload-proof`, {
-          method: 'POST',
-          body: uploadData
-        });
-        if (!uploadRes.ok) throw new Error('Gagal upload gambar');
-        const uploadResult = await uploadRes.json();
+        const uploadResult = await uploadPostEventImage(imageFile.file);
         finalImageUrl = uploadResult.url;
       }
 
-      const payloadContent = JSON.stringify({
-        text: formData.content,
-        postUrl: formData.post_url
-      });
-
       const payload = {
-        title: formData.title,
-        category: formData.category,
-        content: payloadContent,
+        ...formData,
         image_url: finalImageUrl
       };
 
       if (editingId) {
-        const { error } = await supabase
-          .from('posts')
-          .update(payload)
-          .eq('id', editingId);
-        if (error) throw error;
+        await updatePostEvent(editingId, payload);
       } else {
-        const { error } = await supabase
-          .from('posts')
-          .insert([payload]);
-        if (error) throw error;
+        await createPostEvent(payload);
       }
       setIsModalOpen(false);
       fetchPosts();
-      showToast(`Post berhasil ${editingId ? 'diperbarui' : 'dibuat'}!`);
+      showToast(`Otsu Post berhasil ${editingId ? 'diperbarui' : 'dibuat'}!`);
     } catch (error) {
-      console.error('Error saving post:', error);
+      console.error('Error saving post event:', error);
       showToast('Gagal menyimpan post!', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-l-4 border-[#FF0033] pl-6">
         <div>
           <h2 className="text-3xl font-black uppercase tracking-tight italic">Otsu Post Manager</h2>
-          <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] mt-1 font-bold">Kelola pengumuman & rekap kegiatan</p>
+          <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] mt-1 font-bold">Kelola galeri setelah event (After Event)</p>
         </div>
         <button 
           onClick={() => openModal()}
@@ -232,9 +201,7 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
             <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Belum ada post yang diterbitkan</p>
           </div>
         ) : (
-          posts.map((post) => {
-            const parsed = parseContent(post.content);
-            return (
+          posts.map((post) => (
             <div key={post.id} className="glass-card group hover:border-[#FF0033]/40 transition-all duration-500 overflow-hidden flex flex-col">
               <div className="aspect-video bg-[#111] relative overflow-hidden">
                 {post.image_url ? (
@@ -244,16 +211,21 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
                     NO IMAGE
                   </div>
                 )}
-                <div className="absolute top-4 left-4">
-                  <span className="bg-[#FF0033] text-white text-[8px] font-black px-3 py-1 uppercase tracking-widest">
-                    {post.category || 'GENERAL'}
-                  </span>
-                </div>
+                {post.is_featured && (
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-[#FF0033] text-white text-[8px] font-black px-3 py-1 uppercase tracking-widest">
+                      FEATURED
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="p-6 flex flex-col flex-1">
-                <div className="text-[10px] font-bold text-white/30 mb-2">{new Date(post.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div className="text-[10px] font-bold text-white/30 mb-2">
+                  {post.event_date || new Date(post.created_at).toLocaleDateString('id-ID')}
+                </div>
                 <h4 className="text-xl font-black uppercase tracking-tight mb-4 group-hover:text-[#FF0033] transition-colors line-clamp-2">{post.title}</h4>
+                <p className="text-xs text-white/50 line-clamp-2 mb-4 italic">"{post.caption}"</p>
                 
                 <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5">
                   <div className="flex gap-2">
@@ -268,15 +240,15 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
                       <Trash2 size={14} />
                     </button>
                   </div>
-                  {parsed.postUrl && (
-                    <a href={parsed.postUrl} target="_blank" rel="noreferrer" className="text-white/20 hover:text-[#FF0033] transition-all">
+                  {post.instagram_url && (
+                    <a href={post.instagram_url} target="_blank" rel="noreferrer" className="text-white/20 hover:text-[#FF0033] transition-all">
                       <ExternalLink size={14} />
                     </a>
                   )}
                 </div>
               </div>
             </div>
-          )})
+          ))
         )}
       </div>
 
@@ -287,10 +259,10 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
         </div>
         <ul className="mt-4 space-y-2">
           <li className="text-[10px] text-white/40 uppercase font-bold tracking-wider leading-relaxed">
-            ● Gunakan gambar dengan rasio 16:9 untuk hasil terbaik di Otsu Post.
+            ● Gunakan gambar dengan rasio 4:5 atau 1:1 untuk hasil terbaik di galeri Instagram-style.
           </li>
           <li className="text-[10px] text-white/40 uppercase font-bold tracking-wider leading-relaxed">
-            ● Pastikan kategori diisi agar memudahkan fans menyaring berita.
+            ● Caption akan muncul sebagai deskripsi singkat di bawah foto.
           </li>
         </ul>
       </div>
@@ -300,7 +272,7 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
           <div className="glass-card w-full max-w-2xl bg-[#0a0a0a] border-[#FF0033]/20 shadow-[0_0_50px_rgba(255,0,51,0.1)] flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#111]">
               <h3 className="text-xl font-black uppercase tracking-tight italic">
-                {editingId ? 'Edit Post' : 'Tambah Post Baru'}
+                {editingId ? 'Edit Otsu Post' : 'Tambah Otsu Post Baru'}
               </h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
@@ -314,50 +286,48 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Judul Post</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Judul Event</label>
                       <input 
                         required
                         type="text" 
                         value={formData.title}
                         onChange={(e) => setFormData({...formData, title: e.target.value})}
                         className="w-full bg-black border border-white/10 p-3 text-sm font-bold text-white focus:border-[#FF0033] focus:bg-[#111] transition-all outline-none"
-                        placeholder="Masukkan judul post..."
+                        placeholder="Contoh: OTSU-NARU @ OTUMUSE"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Kategori</label>
-                      <select 
-                        value={formData.category}
-                        onChange={(e) => setFormData({...formData, category: e.target.value})}
-                        className="w-full bg-black border border-white/10 p-3 text-sm font-bold text-white focus:border-[#FF0033] focus:bg-[#111] transition-all outline-none appearance-none cursor-pointer"
-                      >
-                        <option value="PENGUMUMAN">PENGUMUMAN</option>
-                        <option value="REKAP EVENT">REKAP EVENT</option>
-                        <option value="GENERAL">GENERAL</option>
-                      </select>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Tanggal Event</label>
+                      <input 
+                        type="text" 
+                        value={formData.event_date}
+                        onChange={(e) => setFormData({...formData, event_date: e.target.value})}
+                        className="w-full bg-black border border-white/10 p-3 text-sm font-bold text-white focus:border-[#FF0033] focus:bg-[#111] transition-all outline-none"
+                        placeholder="Contoh: 18 APRIL 2026"
+                      />
                     </div>
                     
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">URL Post / IG (Opsional)</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Link Instagram</label>
                       <input 
                         type="url" 
-                        value={formData.post_url}
-                        onChange={(e) => setFormData({...formData, post_url: e.target.value})}
+                        value={formData.instagram_url}
+                        onChange={(e) => setFormData({...formData, instagram_url: e.target.value})}
                         className="w-full bg-black border border-white/10 p-3 text-sm font-bold text-white focus:border-[#FF0033] focus:bg-[#111] transition-all outline-none"
-                        placeholder="https://instagram.com/..."
+                        placeholder="https://instagram.com/p/..."
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Gambar Post (Otomatis WebP)</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Foto Utama (WebP)</label>
                     <label className="relative flex-1 flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-white/10 hover:border-[#FF0033]/50 bg-black hover:bg-white/5 transition-all cursor-pointer overflow-hidden group">
                        {imageFile.preview ? (
                           <>
                              <img src={imageFile.preview} alt="Preview" className="w-full h-full object-contain bg-black/20 opacity-80 group-hover:opacity-40 transition-all" />
                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                                <span className="bg-[#FF0033] text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest">Ganti Gambar</span>
+                                <span className="bg-[#FF0033] text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest">Ganti Foto</span>
                              </div>
                              {imageFile.isCompressing && (
                                 <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
@@ -369,7 +339,6 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
                           <div className="flex flex-col items-center text-center p-4">
                              <Upload size={24} className="text-white/20 mb-2 group-hover:text-[#FF0033] transition-colors" />
                              <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest">Klik untuk upload</span>
-                             <span className="text-[8px] text-white/30 uppercase mt-1">JPEG/PNG akan di-compress</span>
                           </div>
                        )}
                        <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
@@ -378,15 +347,26 @@ const CmsSection = ({ showToast, setConfirmModal }) => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Konten / Deskripsi</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-[#FF0033]">Caption / Deskripsi Singkat</label>
                   <textarea 
                     required
-                    rows="3"
-                    value={formData.content}
-                    onChange={(e) => setFormData({...formData, content: e.target.value})}
+                    rows="2"
+                    value={formData.caption}
+                    onChange={(e) => setFormData({...formData, caption: e.target.value})}
                     className="w-full bg-black border border-white/10 p-3 text-sm font-bold text-white focus:border-[#FF0033] focus:bg-[#111] transition-all outline-none resize-none leading-relaxed"
-                    placeholder="Tuliskan isi post..."
+                    placeholder="Tuliskan rekap singkat..."
                   />
+                </div>
+
+                <div className="flex items-center gap-3 py-2">
+                   <input 
+                     type="checkbox" 
+                     id="is_featured"
+                     checked={formData.is_featured}
+                     onChange={(e) => setFormData({...formData, is_featured: e.target.checked})}
+                     className="w-4 h-4 accent-[#FF0033]"
+                   />
+                   <label htmlFor="is_featured" className="text-[10px] font-black uppercase tracking-widest text-white/60 cursor-pointer">Tandai sebagai Unggulan (Featured)</label>
                 </div>
               </div>
 

@@ -56,13 +56,13 @@ const AfterEvent = () => {
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#fff500]/30 to-transparent"></div>
         
 
+    <section className="pt-32 pb-20 relative">
         <div className="container mx-auto px-4 relative z-10 text-center">
           <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] sm:tracking-[0.5em] uppercase text-[#FF0033]">After Event</p>
           <h1 className="text-4xl sm:text-7xl md:text-8xl font-black tracking-tighter mt-4 text-gradient uppercase">OtsuPost Gallery</h1>
           <p className="text-[11px] sm:text-sm md:text-base text-[#888] mt-4 max-w-2xl mx-auto font-bold uppercase tracking-widest">
             Koleksi foto setelah event. Klik fotonya untuk menuju IG resmi.
           </p>
-          
         </div>
       </section>
 

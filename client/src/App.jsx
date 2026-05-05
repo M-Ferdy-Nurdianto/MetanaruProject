@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Members from './pages/Members';
 import Posts from './pages/Posts';
+import AfterEvent from './pages/AfterEvent';
 import Cheki from './pages/Cheki';
 import Checkout from './pages/Checkout';
 import Admin from './pages/admin/Admin';
@@ -35,7 +36,7 @@ function App() {
           <Route path="/members" element={<Members />} />
           <Route path="/posts" element={<Posts />} />
           <Route path="/cheki" element={<Cheki />} />
-          <Route path="/otsu" element={<Posts />} />
+          <Route path="/otsu" element={<AfterEvent />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />

@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /login
 
 Sitemap: https://metanaru.vercel.app/sitemap.xml

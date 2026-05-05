@@ -762,7 +762,7 @@ const Admin = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 lg:ml-5 min-w-0 p-3 sm:p-4 md:p-6 lg:pl-10 lg:pr-10 lg:pt-8 lg:pb-12 relative z-10 overflow-y-auto custom-scrollbar h-full">
+      <main className="flex-1 lg:ml-56 min-w-0 p-3 sm:p-4 md:p-6 lg:pl-10 lg:pr-10 lg:pt-8 lg:pb-12 relative z-10 overflow-y-auto custom-scrollbar h-full">
         <div className="mb-6 sm:mb-10 flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
