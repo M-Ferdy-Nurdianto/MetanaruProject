@@ -29,7 +29,7 @@ const Navbar = () => {
         
         {/* LOGO - ABSOLUTE LEFT ON MOBILE */}
         <Link to="/" className="absolute left-6 md:static group flex items-center">
-          <img src="/logos/logo.png" alt="METANARU" className="h-5 sm:h-6 w-auto group-hover:rotate-12 transition-transform" />
+          <img src="/logos/logo.png" alt="METANARU" className="h-16 w-auto group-hover:rotate-12 transition-transform" />
         </Link>
 
         {/* TEXT - CENTERED */}

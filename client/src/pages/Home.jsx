@@ -150,7 +150,7 @@ const Home = () => {
            <img 
              src="/logos/logo.png" 
              alt="METANARU" 
-             className="w-32 sm:w-40 md:w-64 mb-6 sm:mb-8 drop-shadow-[0_0_30px_rgba(255,0,51,0.5)] animate-fade-in"
+             className="w-48 sm:w-64 md:w-96 mb-6 sm:mb-8 drop-shadow-[0_0_30px_rgba(255,0,51,0.5)] animate-fade-in"
            />
            <h1 className="text-4xl sm:text-7xl md:text-[10rem] font-black text-gradient uppercase tracking-tighter mb-4 leading-none drop-shadow-[0_0_20px_rgba(255,0,51,0.3)]">
               METANARU
