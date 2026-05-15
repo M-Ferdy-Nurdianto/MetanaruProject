@@ -7,8 +7,6 @@ import Loading from '../components/Loading';
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  if (loading) return <Loading />;
-
   const parseContent = (contentStr) => {
     try {
       if (contentStr && typeof contentStr === 'string' && contentStr.startsWith('{')) {
@@ -22,7 +20,7 @@ const Posts = () => {
     const fetchPosts = async () => {
       try {
         const { data, error } = await supabase
-          .from('posts')
+          .from('post_events')
           .select('*')
           .order('created_at', { ascending: false });
         if (error) throw error;
@@ -35,6 +33,8 @@ const Posts = () => {
     };
     fetchPosts();
   }, []);
+
+  if (loading) return <Loading />;
 
   return (
     <div className="bg-black min-h-screen">
@@ -73,11 +73,10 @@ const Posts = () => {
           </div>
         ) : (
           posts.map((post) => {
-            const parsed = parseContent(post.content);
             return (
             <div key={post.id} className="glass-card flex flex-col group overflow-hidden" data-aos="fade-up">
-              {parsed.postUrl ? (
-                <a href={parsed.postUrl} target="_blank" rel="noreferrer" className="aspect-video bg-[#111] flex items-center justify-center relative overflow-hidden cursor-pointer">
+              {post.instagram_url ? (
+                <a href={post.instagram_url} target="_blank" rel="noreferrer" className="aspect-video bg-[#111] flex items-center justify-center relative overflow-hidden cursor-pointer">
                    {post.image_url ? (
                      <img src={post.image_url} alt={post.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />
                    ) : (
@@ -103,10 +102,10 @@ const Posts = () => {
                 <div className="p-6 sm:p-8 md:p-10 flex flex-col gap-4 flex-1">
                   <h2 className="text-2xl sm:text-3xl font-black text-white group-hover:text-[#FF0033] transition-colors uppercase line-clamp-2">{post.title}</h2>
                   <p className="text-[#888] font-bold text-[11px] sm:text-sm leading-relaxed mb-6 tracking-wide line-clamp-3">
-                    {parsed.text}
+                    {post.caption}
                  </p>
-                 {parsed.postUrl ? (
-                   <a href={parsed.postUrl} target="_blank" rel="noreferrer" className="text-[11px] sm:text-xs font-black text-white border-b border-white/20 pb-1 w-fit mt-auto hover:border-[#FF0033] hover:text-[#FF0033] transition-all uppercase tracking-widest">
+                 {post.instagram_url ? (
+                   <a href={post.instagram_url} target="_blank" rel="noreferrer" className="text-[11px] sm:text-xs font-black text-white border-b border-white/20 pb-1 w-fit mt-auto hover:border-[#FF0033] hover:text-[#FF0033] transition-all uppercase tracking-widest">
                       LIHAT DI INSTAGRAM
                    </a>
                  ) : (
