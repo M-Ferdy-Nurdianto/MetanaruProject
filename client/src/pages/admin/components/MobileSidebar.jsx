@@ -7,7 +7,8 @@ import {
   FileSpreadsheet, 
   Settings, 
   FileText,
-  LogOut 
+  LogOut,
+  Package
 } from 'lucide-react';
 import SidebarItem from './SidebarItem';
 
@@ -23,6 +24,7 @@ const MobileSidebar = ({
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'orders', icon: ShoppingBag, label: 'Pesanan' },
+    { id: 'merch', icon: Package, label: 'MERCHANDISE' },
     { id: 'cms', icon: Newspaper, label: 'OTSU POST' },
     { id: 'export', icon: FileSpreadsheet, label: 'Ekspor Data' },
     { id: 'settings', icon: Settings, label: 'EVENT' },

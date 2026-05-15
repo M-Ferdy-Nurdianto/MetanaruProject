@@ -27,6 +27,8 @@ router.post('/upload-proof', upload.single('proof'), orderController.uploadProof
 // Export
 router.get('/export/excel/:eventId', orderController.exportToExcel);
 router.get('/export/pdf/:eventId', orderController.exportToPdf);
+router.get('/export-merch/excel', orderController.exportMerchToExcel);
+router.get('/export-merch/pdf', orderController.exportMerchToPdf);
 
 // Events
 router.get('/events', orderController.getAllEvents);

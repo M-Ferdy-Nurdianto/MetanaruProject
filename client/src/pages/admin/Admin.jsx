@@ -24,11 +24,13 @@ import ConfirmModal from './components/ConfirmModal';
 import OrderDetailsModal from './components/OrderDetailsModal';
 import PrivacyModal from './components/PrivacyModal';
 import AdminToasts from './components/AdminToasts';
+import MerchSection from './components/MerchSection';
 import Loading from '../../components/Loading';
 
 const TAB_LABELS = {
   dashboard: 'Dashboard',
   orders: 'Arsip Pesanan',
+  merch: 'Merchandise',
   cms: 'Otsu Post',
   export: 'Ekspor Data',
   settings: 'Kontrol Event',
@@ -234,6 +236,10 @@ const Admin = () => {
             handleExport={(id, type) => handleExport(id, type, setExportingId, setExportType)} exportingId={exportingId}
             exportType={exportType} openEventModal={openEventModal} deleteEvent={deleteEvent} deletingId={deletingId}
           />
+        )}
+
+        {activeTab === 'merch' && (
+          <MerchSection showToast={showToast} />
         )}
 
         {activeTab === "handbook" && <HandbookSection />}

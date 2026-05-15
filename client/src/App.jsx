@@ -8,6 +8,8 @@ import Posts from './pages/Posts';
 import AfterEvent from './pages/AfterEvent';
 import Cheki from './pages/Cheki';
 import Checkout from './pages/Checkout';
+import Merch from './pages/Merch';
+import MerchOrder from './pages/MerchOrder';
 import Admin from './pages/admin/Admin';
 import Login from './pages/Login';
 import AOS from 'aos';
@@ -38,6 +40,8 @@ function App() {
           <Route path="/cheki" element={<Cheki />} />
           <Route path="/otsu" element={<AfterEvent />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/merch" element={<Merch />} />
+          <Route path="/merch/order" element={<MerchOrder />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>

@@ -3,11 +3,11 @@ import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
 
 const AdminToasts = ({ toasts }) => {
   return (
-    <div className="fixed bottom-8 right-8 z-[2000] flex flex-col gap-3 pointer-events-none items-end">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[2000] flex flex-col gap-3 pointer-events-none items-center w-full max-w-sm px-4">
       {toasts.map(t => (
         <div
           key={t.id}
-          className={`toast-glass px-5 py-4 rounded-2xl border flex items-center gap-4 pointer-events-auto min-w-[280px] group ${
+          className={`toast-glass w-full px-5 py-4 rounded-2xl border flex items-center gap-4 pointer-events-auto group ${
             t.isExiting ? 'animate-toast-out' : 'animate-toast-in'
           } ${
             t.type === 'error' 

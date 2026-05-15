@@ -715,3 +715,208 @@ exports.exportToPdf = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// =============================================
+// EXPORT MERCH: EXCEL
+// =============================================
+exports.exportMerchToExcel = async (req, res) => {
+    try {
+        const { data: merchOrders, error } = await supabase
+            .from('merch_orders')
+            .select('*, merch_order_items(*, merchandise(*))')
+            .neq('status', 'pending');
+        
+        if (error) throw error;
+
+        const workbook = new ExcelJS.Workbook();
+        
+        // Add Logo to Workbook
+        const logoPath = path.join(__dirname, '../../client/public/logos/logo.png');
+        let logoId = null;
+        if (fs.existsSync(logoPath)) {
+            logoId = workbook.addImage({
+                buffer: fs.readFileSync(logoPath),
+                extension: 'png',
+            });
+        }
+
+        const summarySheet = workbook.addWorksheet('Merch Summary');
+        if (logoId !== null) {
+            summarySheet.addImage(logoId, { tl: { col: 0, row: 0 }, ext: { width: 120, height: 40 } });
+            summarySheet.addRow([]); summarySheet.addRow([]); summarySheet.addRow([]);
+        }
+
+        summarySheet.columns = [
+            { header: 'Metric', key: 'metric', width: 30 },
+            { header: 'Value', key: 'value', width: 25 },
+        ];
+
+        const totalSales = merchOrders.reduce((acc, o) => acc + (o.total_harga || 0), 0);
+        let totalItems = 0;
+        const itemStats = {};
+
+        for (const o of merchOrders) {
+            if (o.merch_order_items) {
+                for (const item of o.merch_order_items) {
+                    totalItems += item.quantity;
+                    const name = item.item_name + (item.size ? ` (${item.size})` : '');
+                    if (!itemStats[name]) itemStats[name] = { qty: 0, revenue: 0 };
+                    itemStats[name].qty += item.quantity;
+                    itemStats[name].revenue += (item.harga * item.quantity);
+                }
+            }
+        }
+
+        summarySheet.addRow({ metric: 'Total Merch Revenue', value: totalSales });
+        summarySheet.addRow({ metric: 'Total Items Sold', value: totalItems });
+        summarySheet.addRow({});
+        summarySheet.addRow({ metric: 'ITEM BREAKDOWN', value: 'Qty Sold' });
+        
+        Object.entries(itemStats).forEach(([name, stats]) => {
+            summarySheet.addRow({ metric: name, value: stats.qty });
+        });
+
+        summarySheet.getRow(1).font = { bold: true };
+        summarySheet.getColumn(2).numFmt = '#,##0';
+
+        const detailSheet = workbook.addWorksheet('Order Details');
+        detailSheet.columns = [
+            { header: 'ID', key: 'id', width: 10 },
+            { header: 'Nickname', key: 'nama_lengkap', width: 20 },
+            { header: 'Contact', key: 'whatsapp', width: 20 },
+            { header: 'Items', key: 'items', width: 40 },
+            { header: 'Total Price', key: 'total_harga', width: 15 },
+            { header: 'Payment', key: 'payment_method', width: 12 },
+            { header: 'Address', key: 'shipping_address', width: 30 },
+            { header: 'Date', key: 'created_at', width: 20 },
+        ];
+
+        merchOrders.forEach(order => {
+            const itemsStr = order.merch_order_items?.map(i => `${i.item_name} ${i.size ? `(${i.size})` : ''} x${i.quantity}`).join(', ') || '';
+            detailSheet.addRow({
+                ...order,
+                items: itemsStr,
+                created_at: new Date(order.created_at).toLocaleString('id-ID')
+            });
+        });
+
+        detailSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFE96B' } };
+        detailSheet.getRow(1).font = { bold: true };
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=METANARU_Merch_Report.xlsx`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// =============================================
+// EXPORT MERCH: PDF
+// =============================================
+exports.exportMerchToPdf = async (req, res) => {
+    try {
+        const { data: merchOrders, error } = await supabase
+            .from('merch_orders')
+            .select('*, merch_order_items(*)')
+            .neq('status', 'pending');
+            
+        if (error) throw error;
+
+        const doc = new jsPDF();
+        const pink = [255, 41, 117];
+        const dark = [18, 18, 20];
+
+        doc.setFillColor(...dark);
+        doc.rect(0, 0, 210, 45, 'F');
+
+        const logoPath = path.join(__dirname, '../../client/public/logos/logo.png');
+        if (fs.existsSync(logoPath)) {
+            const logoBase64 = fs.readFileSync(logoPath).toString('base64');
+            doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25);
+        }
+
+        doc.setFontSize(28);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.text("METANARU", 45, 25);
+        doc.setTextColor(...pink);
+        doc.text(".MERCH", 95, 25);
+
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.setFont("helvetica", "normal");
+        doc.text(`OFFICIAL MERCH SUMMARY \u2022 ${new Date().toLocaleDateString('id-ID')}`, 14, 35);
+
+        const totalSales = merchOrders.reduce((acc, o) => acc + (o.total_harga || 0), 0);
+        let totalQty = 0;
+        merchOrders.forEach(o => {
+            if (o.merch_order_items) {
+                totalQty += o.merch_order_items.reduce((acc, i) => acc + i.quantity, 0);
+            }
+        });
+
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text("SALES OVERVIEW", 14, 60);
+        doc.setDrawColor(...pink);
+        doc.setLineWidth(1);
+        doc.line(14, 62, 30, 62);
+
+        const drawCard = (x, y, label, value) => {
+            doc.setFillColor(...dark);
+            doc.roundedRect(x, y, 45, 25, 1, 1, 'F');
+            doc.setFillColor(...pink);
+            doc.rect(x, y, 45, 1.5, 'F');
+            doc.setTextColor(150, 150, 150);
+            doc.setFontSize(7);
+            doc.setFont("helvetica", "bold");
+            doc.text(label, x + 5, y + 8);
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.text(value, x + 5, y + 18);
+        };
+
+        drawCard(14, 68, "TOTAL REVENUE", `Rp ${totalSales.toLocaleString()}`);
+        drawCard(63, 68, "TOTAL ITEMS", `${totalQty} units`);
+
+        doc.setFontSize(14);
+        doc.setTextColor(...dark);
+        doc.setFont("helvetica", "bold");
+        doc.text("TRANSACTION DETAILS", 14, 110);
+        doc.setDrawColor(...pink);
+        doc.line(14, 112, 25, 112);
+
+        const detailData = merchOrders.map(o => {
+            const itemsStr = o.merch_order_items?.map(i => `${i.item_name} x${i.quantity}`).join(', ') || '';
+            return [
+                `#${o.order_number}`,
+                o.nama_lengkap,
+                itemsStr,
+                `Rp ${(o.total_harga || 0).toLocaleString()}`,
+                o.status.toUpperCase()
+            ];
+        });
+
+        doc.autoTable({
+            head: [['ID', 'CUSTOMER', 'ITEMS', 'AMOUNT', 'STATUS']],
+            body: detailData,
+            startY: 118,
+            theme: 'striped',
+            headStyles: { fillColor: dark, textColor: pink, fontStyle: 'bold', fontSize: 10 },
+            styles: { fontSize: 8, cellPadding: 5, font: 'helvetica' },
+            columnStyles: { 3: { halign: 'right', fontStyle: 'bold' } },
+            alternateRowStyles: { fillColor: [250, 250, 250] }
+        });
+
+        const pdfOutput = doc.output();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=METANARU_Merch_Report.pdf`);
+        res.send(Buffer.from(pdfOutput, 'binary'));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

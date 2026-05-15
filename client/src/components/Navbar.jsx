@@ -18,6 +18,7 @@ const Navbar = () => {
     { path: '/', label: 'HOME' },
     { path: '/members', label: 'MEMBER' },
     { path: '/posts', label: 'OTSU' },
+    { path: '/merch', label: 'MERCH' },
     { path: '/cheki', label: 'TIKET' },
   ];
 
