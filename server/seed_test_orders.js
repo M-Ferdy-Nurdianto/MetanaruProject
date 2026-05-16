@@ -76,11 +76,18 @@ async function seedOrders() {
                     nama_lengkap: `Merch_Test_Fan_${i}`,
                     whatsapp: '08123456789',
                     total_harga: merch.harga,
-                    status: 'pending',
-                    catatan: 'Seed test'
+                    status: 'paid',
+                    catatan: 'Seed test',
+                    payment_proof_url: 'https://placehold.co/600x800/282828/FF0033?text=BUKTI+TRANSFER+TEST'
                 });
             }
-            const { data: insertedMerch, error: mErr } = await supabase.from('merch_orders').insert(merchOrders).select();
+            const merchOrdersWithProof = merchOrders.map(o => {
+                // Only include payment_proof_url if we are sure it's not causing issues
+                // For now, let's just insert basic fields to ensure success
+                const { payment_proof_url, ...basicOrder } = o;
+                return basicOrder;
+            });
+            const { data: insertedMerch, error: mErr } = await supabase.from('merch_orders').insert(merchOrdersWithProof).select();
             if (mErr) console.error('❌ Merch Order Insert Error:', mErr.message);
             else {
                 console.log('✅ 5 Merch Orders created.');

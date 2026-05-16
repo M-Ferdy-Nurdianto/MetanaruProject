@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  Eye,
   MessageCircle,
   Instagram,
   Clock,
@@ -58,6 +59,7 @@ const MerchSection = ({ showToast }) => {
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     size_chart_urls: []
   });
+  const [previewImage, setPreviewImage] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -535,6 +537,24 @@ const MerchSection = ({ showToast }) => {
                                 <span>{order.instagram}</span>
                               </a>
                             )}
+
+                            <button 
+                              onClick={() => {
+                                if (order.payment_proof_url) {
+                                  setPreviewImage(order.payment_proof_url);
+                                } else {
+                                  showToast('Pelanggan belum mengunggah bukti pembayaran', 'error');
+                                }
+                              }}
+                              className={`mt-2 flex items-center gap-2 text-[9px] py-1.5 px-2.5 rounded border transition-all font-black uppercase w-fit ${
+                                order.payment_proof_url 
+                                  ? 'bg-green-500/10 border-green-500/20 text-green-500 hover:bg-green-500 hover:text-white shadow-[0_0_10px_rgba(34,197,94,0.1)]' 
+                                  : 'bg-white/5 border-white/10 text-white/20 hover:bg-white/10'
+                              }`}
+                            >
+                              <Eye size={10} />
+                              {order.payment_proof_url ? 'Lihat Bukti Bayar' : 'Bukti Belum Ada'}
+                            </button>
                           </div>
                         </div>
                       </td>
@@ -617,6 +637,35 @@ const MerchSection = ({ showToast }) => {
               <p className="text-white/40 font-bold uppercase tracking-widest">Belum ada pesanan</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* PROOF PREVIEW MODAL */}
+      {previewImage && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/95 backdrop-blur-sm" onClick={() => setPreviewImage(null)} />
+          <div className="relative max-w-4xl w-full flex flex-col items-center">
+            <button 
+              onClick={() => setPreviewImage(null)}
+              className="absolute -top-12 right-0 text-white/60 hover:text-white flex items-center gap-2 font-black uppercase text-xs"
+            >
+              <X size={24} /> Close
+            </button>
+            <img 
+              src={previewImage} 
+              alt="Payment Proof" 
+              className="max-h-[85vh] object-contain rounded-xl shadow-2xl border border-white/10"
+            />
+            <div className="mt-4 flex gap-4">
+               <a 
+                href={previewImage} 
+                target="_blank" 
+                className="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-full font-black uppercase text-xs tracking-widest transition-all"
+               >
+                 Buka di Tab Baru
+               </a>
+            </div>
+          </div>
         </div>
       )}
 

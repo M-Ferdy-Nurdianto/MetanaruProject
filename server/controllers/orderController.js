@@ -729,79 +729,80 @@ exports.exportMerchToExcel = async (req, res) => {
         if (error) throw error;
 
         const workbook = new ExcelJS.Workbook();
-        
-        // Add Logo to Workbook
-        const logoPath = path.join(__dirname, '../../client/public/logos/logo.png');
-        let logoId = null;
-        if (fs.existsSync(logoPath)) {
-            logoId = workbook.addImage({
-                buffer: fs.readFileSync(logoPath),
-                extension: 'png',
-            });
-        }
+        const sheet = workbook.addWorksheet('Main Report');
 
-        const summarySheet = workbook.addWorksheet('Merch Summary');
-        if (logoId !== null) {
-            summarySheet.addImage(logoId, { tl: { col: 0, row: 0 }, ext: { width: 120, height: 40 } });
-            summarySheet.addRow([]); summarySheet.addRow([]); summarySheet.addRow([]);
-        }
+        // Header Section
+        sheet.addRow(['METANARU OFFICIAL MERCH REPORT']);
+        sheet.getRow(1).font = { bold: true, size: 16 };
+        sheet.addRow([`Generated on: ${new Date().toLocaleString('id-ID')}`]);
+        sheet.addRow([]);
 
-        summarySheet.columns = [
-            { header: 'Metric', key: 'metric', width: 30 },
-            { header: 'Value', key: 'value', width: 25 },
-        ];
-
+        // Statistics
         const totalSales = merchOrders.reduce((acc, o) => acc + (o.total_harga || 0), 0);
-        let totalItems = 0;
+        let totalItemsCount = 0;
         const itemStats = {};
 
         for (const o of merchOrders) {
-            if (o.merch_order_items) {
-                for (const item of o.merch_order_items) {
-                    totalItems += item.quantity;
-                    const name = item.item_name + (item.size ? ` (${item.size})` : '');
-                    if (!itemStats[name]) itemStats[name] = { qty: 0, revenue: 0 };
-                    itemStats[name].qty += item.quantity;
-                    itemStats[name].revenue += (item.harga * item.quantity);
-                }
-            }
+            o.merch_order_items?.forEach(item => {
+                totalItemsCount += item.quantity;
+                const name = item.item_name + (item.size ? ` (${item.size})` : '');
+                if (!itemStats[name]) itemStats[name] = { qty: 0, revenue: 0 };
+                itemStats[name].qty += item.quantity;
+                itemStats[name].revenue += (item.harga * item.quantity);
+            });
         }
 
-        summarySheet.addRow({ metric: 'Total Merch Revenue', value: totalSales });
-        summarySheet.addRow({ metric: 'Total Items Sold', value: totalItems });
-        summarySheet.addRow({});
-        summarySheet.addRow({ metric: 'ITEM BREAKDOWN', value: 'Qty Sold' });
+        sheet.addRow(['SALES OVERVIEW']);
+        sheet.lastRow.font = { bold: true, size: 12 };
+        sheet.addRow(['Total Merch Revenue', totalSales]);
+        sheet.lastRow.getCell(2).numFmt = '"Rp "#,##0';
+        sheet.addRow(['Total Items Sold', totalItemsCount]);
+        sheet.addRow([]);
+
+        // Item Breakdown
+        const breakdownHeader = sheet.addRow(['ITEM BREAKDOWN', 'QTY SOLD', 'TOTAL REVENUE']);
+        breakdownHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        breakdownHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF282828' } };
         
         Object.entries(itemStats).forEach(([name, stats]) => {
-            summarySheet.addRow({ metric: name, value: stats.qty });
+            const row = sheet.addRow([name, stats.qty, stats.revenue]);
+            row.getCell(3).numFmt = '"Rp "#,##0';
         });
+        sheet.addRow([]);
+        sheet.addRow([]);
 
-        summarySheet.getRow(1).font = { bold: true };
-        summarySheet.getColumn(2).numFmt = '#,##0';
-
-        const detailSheet = workbook.addWorksheet('Order Details');
-        detailSheet.columns = [
-            { header: 'ID', key: 'id', width: 10 },
-            { header: 'Nickname', key: 'nama_lengkap', width: 20 },
-            { header: 'Contact', key: 'whatsapp', width: 20 },
-            { header: 'Items', key: 'items', width: 40 },
-            { header: 'Total Price', key: 'total_harga', width: 15 },
-            { header: 'Payment', key: 'payment_method', width: 12 },
-            { header: 'Address', key: 'shipping_address', width: 30 },
-            { header: 'Date', key: 'created_at', width: 20 },
-        ];
+        // Transaction Details
+        sheet.addRow(['TRANSACTION DETAILS']);
+        sheet.lastRow.font = { bold: true, size: 12 };
+        const tableHeader = sheet.addRow([
+            'ID', 'Customer Name', 'WhatsApp', 'Instagram', 'Items Ordered', 
+            'Total Price', 'Payment Method', 'Status', 'Shipping Address', 'Transaction Date'
+        ]);
+        tableHeader.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        tableHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF282828' } };
 
         merchOrders.forEach(order => {
             const itemsStr = order.merch_order_items?.map(i => `${i.item_name} ${i.size ? `(${i.size})` : ''} x${i.quantity}`).join(', ') || '';
-            detailSheet.addRow({
-                ...order,
-                items: itemsStr,
-                created_at: new Date(order.created_at).toLocaleString('id-ID')
-            });
+            const row = sheet.addRow([
+                order.order_number,
+                order.nama_lengkap,
+                order.whatsapp,
+                order.instagram,
+                itemsStr,
+                order.total_harga,
+                order.payment_method,
+                order.status,
+                order.shipping_address,
+                new Date(order.created_at).toLocaleString('id-ID')
+            ]);
+            row.getCell(6).numFmt = '"Rp "#,##0';
         });
 
-        detailSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFE96B' } };
-        detailSheet.getRow(1).font = { bold: true };
+        // Column widths
+        sheet.columns = [
+            { width: 20 }, { width: 25 }, { width: 20 }, { width: 20 }, { width: 50 },
+            { width: 15 }, { width: 15 }, { width: 12 }, { width: 40 }, { width: 25 }
+        ];
 
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename=METANARU_Merch_Report.xlsx`);
@@ -809,6 +810,7 @@ exports.exportMerchToExcel = async (req, res) => {
         await workbook.xlsx.write(res);
         res.end();
     } catch (error) {
+        console.error('exportMerchToExcel error:', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -838,12 +840,12 @@ exports.exportMerchToPdf = async (req, res) => {
             doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25);
         }
 
-        doc.setFontSize(28);
+        doc.setFontSize(24);
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
         doc.text("METANARU", 45, 25);
-        doc.setTextColor(...pink);
-        doc.text(".MERCH", 95, 25);
+        doc.setTextColor(180, 180, 180);
+        doc.text("MERCH", 98, 25);
 
         doc.setFontSize(10);
         doc.setTextColor(150, 150, 150);
@@ -861,14 +863,14 @@ exports.exportMerchToPdf = async (req, res) => {
         doc.setFontSize(12);
         doc.setTextColor(0);
         doc.text("SALES OVERVIEW", 14, 60);
-        doc.setDrawColor(...pink);
+        doc.setDrawColor(40, 40, 40);
         doc.setLineWidth(1);
         doc.line(14, 62, 30, 62);
 
         const drawCard = (x, y, label, value) => {
             doc.setFillColor(...dark);
             doc.roundedRect(x, y, 45, 25, 1, 1, 'F');
-            doc.setFillColor(...pink);
+            doc.setFillColor(60, 60, 60);
             doc.rect(x, y, 45, 1.5, 'F');
             doc.setTextColor(150, 150, 150);
             doc.setFontSize(7);
@@ -886,15 +888,55 @@ exports.exportMerchToPdf = async (req, res) => {
         doc.setFontSize(14);
         doc.setTextColor(...dark);
         doc.setFont("helvetica", "bold");
-        doc.text("TRANSACTION DETAILS", 14, 110);
-        doc.setDrawColor(...pink);
+        doc.text("ITEM SALES SUMMARY", 14, 110);
+        doc.setDrawColor(40, 40, 40);
         doc.line(14, 112, 25, 112);
 
+        // Group item stats for the table
+        const itemStats = {};
+        merchOrders.forEach(o => {
+            o.merch_order_items?.forEach(item => {
+                const key = item.item_name + (item.size ? ` [${item.size}]` : '');
+                if (!itemStats[key]) itemStats[key] = { qty: 0, revenue: 0 };
+                itemStats[key].qty += item.quantity;
+                itemStats[key].revenue += (item.harga * item.quantity);
+            });
+        });
+
+        const itemSummaryData = Object.entries(itemStats).map(([name, stats]) => [
+            name,
+            `${stats.qty} pcs`,
+            `Rp ${stats.revenue.toLocaleString()}`
+        ]);
+
+        doc.autoTable({
+            head: [['ITEM NAME', 'QTY SOLD', 'TOTAL REVENUE']],
+            body: itemSummaryData,
+            startY: 118,
+            theme: 'grid',
+            headStyles: { fillColor: [40, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold' },
+            styles: { fontSize: 9, cellPadding: 4, font: 'helvetica', lineColor: [200, 200, 200], lineWidth: 0.1 },
+            columnStyles: { 
+                1: { halign: 'center' },
+                2: { halign: 'right', fontStyle: 'bold', textColor: [0, 0, 0] } 
+            }
+        });
+
+        // Transaction Details
+        doc.addPage();
+        doc.setFillColor(...dark);
+        doc.rect(0, 0, 210, 20, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.text("TRANSACTION ARCHIVE", 14, 13);
+
         const detailData = merchOrders.map(o => {
-            const itemsStr = o.merch_order_items?.map(i => `${i.item_name} x${i.quantity}`).join(', ') || '';
+            const itemsStr = o.merch_order_items?.map(i => `${i.item_name} x${i.quantity}`).join('\n') || '';
+            const contactStr = `WA: ${o.whatsapp || '-'}\nIG: ${o.instagram || '-'}`;
             return [
                 `#${o.order_number}`,
                 o.nama_lengkap,
+                contactStr,
                 itemsStr,
                 `Rp ${(o.total_harga || 0).toLocaleString()}`,
                 o.status.toUpperCase()
@@ -902,15 +944,36 @@ exports.exportMerchToPdf = async (req, res) => {
         });
 
         doc.autoTable({
-            head: [['ID', 'CUSTOMER', 'ITEMS', 'AMOUNT', 'STATUS']],
+            head: [['ID', 'CUSTOMER', 'CONTACT', 'ITEMS', 'AMOUNT', 'STATUS']],
             body: detailData,
-            startY: 118,
-            theme: 'striped',
-            headStyles: { fillColor: dark, textColor: pink, fontStyle: 'bold', fontSize: 10 },
-            styles: { fontSize: 8, cellPadding: 5, font: 'helvetica' },
-            columnStyles: { 3: { halign: 'right', fontStyle: 'bold' } },
-            alternateRowStyles: { fillColor: [250, 250, 250] }
+            startY: 25,
+            theme: 'grid',
+            headStyles: { fillColor: [40, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 10 },
+            styles: { fontSize: 7, cellPadding: 3, font: 'helvetica', overflow: 'linebreak', lineColor: [220, 220, 220], lineWidth: 0.1 },
+            columnStyles: { 
+                0: { cellWidth: 25 },
+                1: { cellWidth: 25 },
+                2: { cellWidth: 35 },
+                4: { halign: 'right', fontStyle: 'bold' },
+                5: { halign: 'center' }
+            },
+            alternateRowStyles: { fillColor: [255, 255, 255] }
         });
+
+        // Footer Enhancement
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFillColor(...dark);
+            doc.rect(0, 280, 210, 20, 'F');
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`METANARU OFFICIAL MERCH REPORT \u2022 ${new Date().toLocaleDateString('id-ID')}`, 14, 288);
+            doc.setTextColor(255, 255, 255);
+            doc.text(`PAGE ${i} / ${pageCount}`, 180, 288);
+            doc.setFillColor(60, 60, 60);
+            doc.rect(0, 280, 210, 0.5, 'F');
+        }
 
         const pdfOutput = doc.output();
         res.setHeader('Content-Type', 'application/pdf');
