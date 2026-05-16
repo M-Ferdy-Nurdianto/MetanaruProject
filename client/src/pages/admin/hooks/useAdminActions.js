@@ -67,7 +67,7 @@ export const useAdminActions = ({
         setOTSForm(prev => ({
           ...prev, nickname: '', contact: '', selectedMembers: {}, payment_method: 'cash'
         }));
-        fetchData();
+        fetchData(true);
       }
     } catch (err) {
       showToast("Gagal membuat pesanan booth", "error");
@@ -90,7 +90,7 @@ export const useAdminActions = ({
           const res = await fetch(`${ADMIN_API}/orders/${id}`, { method: 'DELETE' });
           if (res.ok) {
             showToast("Pesanan berhasil dihapus.");
-            fetchData();
+            fetchData(true);
           } else {
             const data = await res.json();
             showToast(data.error || "Gagal menghapus pesanan", "error");
@@ -117,7 +117,7 @@ export const useAdminActions = ({
       });
       if (response.ok) {
         showToast(`Event berhasil ${eventModal.mode === 'add' ? 'dibuat' : 'diperbarui'}!`);
-        fetchData();
+        fetchData(true);
         setEventModal({ show: false, mode: 'add', data: null });
         setEventForm({ 
           name: '', date: '', po_deadline: '', status: 'ongoing', type: 'standard', 
@@ -148,7 +148,7 @@ export const useAdminActions = ({
           const res = await fetch(`${ADMIN_API}/orders/events/${id}`, { method: 'DELETE' });
           if (res.ok) {
             showToast("Event berhasil dihapus secara permanen.");
-            fetchData();
+            fetchData(true);
           }
         } catch (err) { showToast("Terjadi kesalahan sistem", "error"); }
         finally { setDeletingId(null); }
@@ -218,7 +218,7 @@ export const useAdminActions = ({
         showToast("Data pesanan berhasil diperbarui!");
         setShowEditOTSModal(false);
         setEditingOTS(null);
-        fetchData();
+        fetchData(true);
       } else showToast("Gagal memperbarui pesanan", "error");
     } catch (err) { showToast("Terjadi kesalahan sistem", "error"); }
     finally { setIsUpdatingOTS(false); }

@@ -97,8 +97,8 @@ export const useAdminData = () => {
     }, 3000);
   }, []);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [ordRes, evRes, setRes, memData] = await Promise.all([
         fetch(`${ADMIN_API}/orders`),

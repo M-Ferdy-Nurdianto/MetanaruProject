@@ -130,7 +130,7 @@ const MerchSection = ({ showToast }) => {
           
           canvas.toBlob((blob) => {
             resolve(blob);
-          }, 'image/jpeg', 0.8); // 80% quality
+          }, 'image/webp', 0.8); // 80% quality WebP
         };
       };
     });
@@ -144,7 +144,7 @@ const MerchSection = ({ showToast }) => {
     try {
       const uploadPromises = files.map(async (file) => {
         const compressedBlob = await compressImage(file);
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.webp`;
         const filePath = `merchandise/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -291,10 +291,29 @@ const MerchSection = ({ showToast }) => {
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', orderId);
       if (error) throw error;
+      
+      // Update state locally to avoid "hard refresh" scroll jump
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
       showToast('Status pesanan diperbarui');
-      fetchData();
     } catch (error) {
       showToast('Gagal memperbarui status', 'error');
+    }
+  };
+
+  const deleteOrder = async (orderId) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) return;
+    try {
+      const { error } = await supabase
+        .from('merch_orders')
+        .delete()
+        .eq('id', orderId);
+      if (error) throw error;
+      
+      // Update state locally
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+      showToast('Pesanan berhasil dihapus');
+    } catch (error) {
+      showToast('Gagal menghapus pesanan', 'error');
     }
   };
 
@@ -363,7 +382,6 @@ const MerchSection = ({ showToast }) => {
             <option value="all">Semua Status</option>
             <option value="pending">Pending</option>
             <option value="paid">Paid</option>
-            <option value="shipped">Shipped</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
@@ -467,92 +485,130 @@ const MerchSection = ({ showToast }) => {
             </div>
           </div>
 
-          <div className="space-y-4">
-            {filteredOrders.map(order => (
-            <div key={order.id} className="metal-card p-6 flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black tracking-widest border border-white/10">
-                    {order.order_number}
-                  </div>
-                  <div className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest border uppercase ${
-                    order.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' :
-                    order.status === 'paid' ? 'bg-green-500/10 border-green-500/30 text-green-500' :
-                    order.status === 'shipped' ? 'bg-blue-500/10 border-blue-500/30 text-blue-500' :
-                    'bg-white/10 border-white/20 text-white/60'
-                  }`}>
-                    {order.status}
-                  </div>
-                </div>
-                
-                <h4 className="text-xl font-bold mb-1">{order.nama_lengkap}</h4>
-                <div className="flex flex-wrap gap-4 text-sm text-white/50 mb-4">
-                  <a href={`https://wa.me/${order.whatsapp?.replace(/\D/g, '')}`} target="_blank" className="flex items-center gap-1.5 hover:text-[#25D366] transition-colors">
-                    <MessageCircle size={14} /> {order.whatsapp}
-                  </a>
-                  {order.instagram && (
-                    <a href={`https://instagram.com/${order.instagram.replace('@', '')}`} target="_blank" className="flex items-center gap-1.5 hover:text-[#E1306C] transition-colors">
-                      <Instagram size={14} /> {order.instagram}
-                    </a>
-                  )}
-                </div>
+          {/* ORDERS TABLE */}
+          <div className="metal-card overflow-hidden border border-white/10 bg-black/40">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-white/5 border-b border-white/10 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                    <th className="p-4 text-center w-12">No</th>
+                    <th className="p-4">Customer & Order ID</th>
+                    <th className="p-4">Merch Items</th>
+                    <th className="p-4">Total</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {filteredOrders.map((order, index) => (
+                    <tr key={order.id} className="group hover:bg-white/[0.02] transition-colors">
+                      {/* 1. Number */}
+                      <td className="p-4 text-center text-xs font-black text-white/20">
+                        {index + 1}
+                      </td>
 
-                <div className="space-y-2 mb-4">
-                  {order.merch_order_items?.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-black/40">
-                          <img src={item.merchandise?.images?.[0] || item.merchandise?.gambar_url} alt="" className="w-full h-full object-cover" />
+                      {/* 2. Customer Info */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-sm font-bold text-white group-hover:text-[#FF0033] transition-colors">
+                            {order.nama_lengkap}
+                          </span>
+                          <span className="text-[10px] font-mono text-white/40">
+                            {order.order_number}
+                          </span>
+                          <div className="flex flex-col gap-1 mt-1">
+                            <a 
+                              href={`https://wa.me/${order.whatsapp?.replace(/\D/g, '')}`} 
+                              target="_blank" 
+                              className="flex items-center gap-2 text-[11px] text-green-500/80 hover:text-green-500 transition-colors"
+                            >
+                              <MessageCircle size={12} />
+                              <span className="font-mono">{order.whatsapp}</span>
+                            </a>
+                            {order.instagram && (
+                              <a 
+                                href={`https://instagram.com/${order.instagram.replace('@', '')}`} 
+                                target="_blank" 
+                                className="flex items-center gap-2 text-[11px] text-pink-500/80 hover:text-pink-500 transition-colors"
+                              >
+                                <Instagram size={12} />
+                                <span>{order.instagram}</span>
+                              </a>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-bold">{item.item_name} {item.size ? `(${item.size})` : ''}</p>
-                          <p className="text-[10px] text-white/40 uppercase font-bold">Qty: {item.quantity}</p>
+                      </td>
+
+                      {/* 3. Items List */}
+                      <td className="p-4 max-w-xs">
+                        <div className="space-y-2">
+                          {order.merch_order_items?.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-[10px] text-white/70 leading-tight">
+                              <span className="w-4 h-4 rounded bg-white/5 flex items-center justify-center text-[8px] font-black">{item.quantity}x</span>
+                              <span className="font-bold truncate">{item.item_name}</span>
+                              {item.size && <span className="text-white/30">[{item.size}]</span>}
+                            </div>
+                          ))}
+                          {order.catatan && (
+                            <div className="flex items-start gap-1 text-[9px] text-amber-500/80 italic bg-amber-500/5 p-1.5 rounded border border-amber-500/10">
+                              <AlertCircle size={10} className="shrink-0 mt-0.5" />
+                              <span className="line-clamp-1">{order.catatan}</span>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                      <p className="text-sm font-black text-[#FF0033]">Rp {(item.harga * item.quantity).toLocaleString()}</p>
-                    </div>
+                      </td>
+
+                      {/* 4. Total Price */}
+                      <td className="p-4">
+                        <span className="text-sm font-black text-[#FF0033]">
+                          Rp {order.total_harga?.toLocaleString()}
+                        </span>
+                      </td>
+
+                      {/* 5. Status Badge */}
+                      <td className="p-4">
+                        <div className={`inline-flex px-2 py-1 rounded text-[9px] font-black tracking-widest border uppercase ${
+                          order.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' :
+                          order.status === 'paid' ? 'bg-green-500/10 border-green-500/30 text-green-500' :
+                          order.status === 'completed' ? 'bg-purple-500/10 border-purple-500/30 text-purple-500' :
+                          'bg-white/10 border-white/20 text-white/60'
+                        }`}>
+                          {order.status}
+                        </div>
+                      </td>
+
+                      {/* 6. Actions */}
+                      <td className="p-4">
+                        <div className="flex flex-col gap-1.5 items-center">
+                          <div className="flex gap-1.5 w-full">
+                            <button 
+                              onClick={() => updateOrderStatus(order.id, 'paid')}
+                              title="Confirm Payment"
+                              className="flex-1 py-1.5 bg-green-600/10 hover:bg-green-600 border border-green-600/30 text-green-500 hover:text-white rounded-lg text-[9px] font-black uppercase transition-all"
+                            >
+                              Paid
+                            </button>
+                            <button 
+                              onClick={() => deleteOrder(order.id)}
+                              title="Hapus Pesanan"
+                              className="px-2 py-1.5 bg-red-600/10 hover:bg-red-600 border border-red-600/30 text-red-500 hover:text-white rounded-lg transition-all"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                          <button 
+                            onClick={() => updateOrderStatus(order.id, 'completed')}
+                            className="w-full py-1.5 bg-white/5 hover:bg-white border border-white/10 text-white/40 hover:text-black rounded-lg text-[9px] font-black uppercase transition-all"
+                          >
+                            Mark Complete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-
-                {order.catatan && (
-                  <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded-xl mb-4">
-                    <p className="text-[10px] uppercase font-black text-amber-500 mb-1 flex items-center gap-1">
-                      <AlertCircle size={10} /> Catatan Pembeli
-                    </p>
-                    <p className="text-sm italic text-amber-200/80">{order.catatan}</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="md:w-64 flex flex-col gap-3 justify-between">
-                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
-                  <p className="text-[10px] uppercase font-black text-white/30 mb-1">Total Bayar</p>
-                  <p className="text-2xl font-black text-white">Rp {order.total_harga?.toLocaleString()}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <button 
-                    onClick={() => updateOrderStatus(order.id, 'paid')}
-                    className="flex-1 py-2 bg-green-600/20 hover:bg-green-600 text-green-500 hover:text-white rounded-xl text-[10px] font-black uppercase transition-all border border-green-500/30"
-                  >
-                    Confirm Paid
-                  </button>
-                  <button 
-                    onClick={() => updateOrderStatus(order.id, 'shipped')}
-                    className="flex-1 py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-500 hover:text-white rounded-xl text-[10px] font-black uppercase transition-all border border-blue-500/30"
-                  >
-                    Mark Shipped
-                  </button>
-                  <button 
-                    onClick={() => updateOrderStatus(order.id, 'completed')}
-                    className="col-span-2 py-2 bg-white/5 hover:bg-white text-white/50 hover:text-black rounded-xl text-[10px] font-black uppercase transition-all border border-white/10"
-                  >
-                    Complete Order
-                  </button>
-                </div>
-              </div>
+                </tbody>
+              </table>
             </div>
-          ))}
           </div>
 
           {filteredOrders.length === 0 && (
